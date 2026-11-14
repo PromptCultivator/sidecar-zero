@@ -1,0 +1,17 @@
+name = "a supervisor told to stop keeps serving the attached host"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "signal"
+target = "supervisor"
+sig = "TERM"
+
+[[step]]
+do = "sleep"
+ms = 100
+
+[[step]]
+do = "call"
+count = 200

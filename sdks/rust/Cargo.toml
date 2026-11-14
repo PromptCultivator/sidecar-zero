@@ -1,0 +1,17 @@
+[package]
+name = "sidecarzero"
+description = "Rust client for SidecarZero: model inference through shared memory, with a mandatory fallback"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# Crash points in the client's stores, for the crash-point harness only (testing §2.4).
+crashpoints = ["scz-shm/crashpoints"]
+
+[dependencies]
+scz-shm = { path = "../../crates/scz-shm" }
+
+[lints]
+workspace = true

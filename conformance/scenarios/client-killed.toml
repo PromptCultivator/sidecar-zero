@@ -1,0 +1,38 @@
+name = "the agent is killed mid-call; a new one finds no stuck slot"
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 100000
+background = true
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "signal"
+target = "agent"
+
+[[step]]
+do = "wait"
+stat = "resets"
+min = 1
+
+[[step]]
+do = "start_agent"
+agent = "b"
+
+[[step]]
+do = "bound"
+agent = "b"
+
+[[step]]
+do = "call"
+agent = "b"
+count = 200

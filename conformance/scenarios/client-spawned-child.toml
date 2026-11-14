@@ -1,0 +1,37 @@
+name = "a child process the agent spawned does not keep the session alive after the agent dies"
+needs = ["spawn"]
+
+# The session socket and the memfds are close-on-exec, so the sleeping child holds none of
+# them; when the agent is killed the supervisor sees the session end and resets it.
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "spawn"
+
+[[step]]
+do = "call"
+count = 50
+
+[[step]]
+do = "signal"
+target = "agent"
+
+[[step]]
+do = "wait"
+stat = "resets"
+min = 1
+
+[[step]]
+do = "start_agent"
+agent = "b"
+
+[[step]]
+do = "bound"
+agent = "b"
+
+[[step]]
+do = "call"
+agent = "b"
+count = 100

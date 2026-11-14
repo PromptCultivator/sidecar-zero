@@ -1,0 +1,48 @@
+name = "crash at worker.handover.released"
+crash_at = "worker.handover.released"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE", "GATE_INIT", "GATE_RELOADING", "GATE_DRAINING", "NOT_CONNECTED"]
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+# Each call takes at least 20 µs in the worker, so the load lasts long enough, in any
+# build profile, for the fault to land in the middle of it.
+count = 5000
+op = "delay"
+arg = 20
+background = true
+
+[[step]]
+do = "sleep"
+ms = 30
+
+[[step]]
+do = "ctl"
+cmd = "reload"
+
+[[step]]
+do = "join"
+
+# A worker killed after RELEASED owns no ring and no slot. If the supervisor reads RELEASED
+# first, the kill is an ordinary exit and costs nothing; if the death lock's report arrives
+# first, it is handled as a death. Either way the reload completes.
+[[step]]
+do = "wait"
+stat = "reloads"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200

@@ -1,0 +1,15 @@
+name = "close unmaps the arena"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 20
+
+[[step]]
+do = "close"
+
+[[step]]
+do = "proc"
+maps = 0

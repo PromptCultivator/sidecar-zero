@@ -1,0 +1,15 @@
+name = "forty-eight threads making their first calls at once: every one finds a free slot"
+
+# More callers than the slot probe's limit (16): if every caller entry began probing at the same
+# slot, the seventeenth would find none free although a thousand are (sdk-contract §4, "The slot
+# probe is bounded").
+
+[agent]
+threads = 48
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200

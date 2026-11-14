@@ -1,0 +1,46 @@
+name = "a supervisor stopping with the host still attached: once its session grace is over, calls see the gate draining"
+covers = ["GATE_DRAINING"]
+
+# Supervisor §8: told to stop while a session is open, the supervisor keeps serving for the
+# session grace, then sets the gate to DRAINING and asks the worker to pause. A short grace,
+# and an inference in hand that outlasts it, keep the gate DRAINING until that inference
+# finishes (well inside the drain timeout, 2.5 s here). Then the sidecar is started again and
+# the agent reconnects to the new one.
+
+[sidecar]
+args = ["--session-grace-ms=100", "--max-deadline-ms=2000"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+op = "hang"
+arg = 1500
+expect = "fallback"
+reasons = ["DEADLINE"]
+
+[[step]]
+do = "signal"
+target = "supervisor"
+sig = "TERM"
+
+[[step]]
+do = "sleep"
+ms = 400
+
+[[step]]
+do = "call"
+count = 50
+expect = "fallback"
+reasons = ["GATE_DRAINING"]
+
+[[step]]
+do = "restart_sidecar"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 50

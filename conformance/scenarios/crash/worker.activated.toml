@@ -1,0 +1,27 @@
+name = "crash at worker.activated"
+crash_at = "worker.activated"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE", "GATE_INIT"]
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200
+expect = "mixed"
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

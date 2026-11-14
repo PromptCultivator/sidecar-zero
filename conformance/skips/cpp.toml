@@ -1,0 +1,4 @@
+# Scenarios the cpp agent skips, each with the reason (testing §3: never skipped silently).
+[skip]
+"client-fallback-throws" = "the C++ contract requires a noexcept fallback (sdk-contract §3.1, §3.2): a throwing one does not compile, so the agent has no `throws` capability"
+"client-clock-skew" = "the C++ SDK reads CLOCK_MONOTONIC itself (sdk-cpp20 §5) and has no cheap clock to skew, so it cannot raise CLOCK_FAULT"

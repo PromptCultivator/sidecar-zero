@@ -1,0 +1,33 @@
+name = "a codec that fails on encode and on decode: CODEC_ERROR, slot released"
+covers = ["CODEC_ERROR"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "codec_fault"
+mode = "encode"
+
+[[step]]
+do = "call"
+count = 5
+expect = "fallback"
+reasons = ["CODEC_ERROR"]
+
+[[step]]
+do = "codec_fault"
+mode = "decode"
+
+[[step]]
+do = "call"
+count = 5
+expect = "fallback"
+reasons = ["CODEC_ERROR"]
+
+[[step]]
+do = "codec_fault"
+mode = "off"
+
+[[step]]
+do = "call"
+count = 100

@@ -1,0 +1,15 @@
+# Fallback reasons no scenario produces, each with why (testing §3, "Coverage checks").
+# The suite check fails if a reason is neither produced by some scenario nor listed here, and
+# if a reason listed here is produced (so the list only shrinks). `[exempt]` holds for every
+# SDK; `[sdk.<name>]` (the agent's `sdk=`) for one.
+
+[exempt]
+
+[sdk.rust]
+CLOCK_FAULT = "the Rust SDK reads CLOCK_MONOTONIC directly and has no cheap clock to skew"
+
+[sdk.cpp]
+CLOCK_FAULT = "the C++ SDK reads CLOCK_MONOTONIC directly and has no cheap clock to skew"
+
+[sdk.python]
+CLOCK_FAULT = "the Python SDK is the Rust client, which reads CLOCK_MONOTONIC directly"

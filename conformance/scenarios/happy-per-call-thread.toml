@@ -1,0 +1,13 @@
+name = "a new thread for every call: caller entries are claimed and given back"
+needs = ["per-call"]
+
+[agent]
+threads = 4
+kind = "per-call"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 250

@@ -1,0 +1,42 @@
+name = "a worker stalled between completing a slot and waking its client: late wake-ups counted, every call resolved by its deadline"
+stall = true
+
+# The worker works on each request for 3 ms, so that its caller has parked, completes it, and
+# then waits 30 ms before waking the parked caller,
+# whose budget is 10 ms. The caller's wait times out, finds the slot DONE, takes the answer,
+# and counts a late wake-up (signaling §7). The pauses let the stalled worker finish.
+
+[agent]
+spin = "off"
+budget_us = 10000
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+op = "stall_wake"
+arg = 30
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "call"
+op = "stall_wake"
+arg = 30
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "agent_stat"
+stat = "late_wakes"
+min = 2
+
+[[step]]
+do = "call"
+count = 100
+budget_us = 20000

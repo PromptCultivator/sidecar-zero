@@ -1,0 +1,72 @@
+name = "each error status surfaces as its own reason"
+covers = ["MODEL_ERROR", "BAD_REQUEST", "RESOURCE_EXHAUSTED", "REBINDING", "DEADLINE", "WORKER_FAILED"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "MODEL_ERROR"
+expect = "fallback"
+reasons = ["MODEL_ERROR"]
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "BAD_REQUEST"
+expect = "fallback"
+reasons = ["BAD_REQUEST"]
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "RESOURCE_EXHAUSTED"
+expect = "fallback"
+reasons = ["RESOURCE_EXHAUSTED"]
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "STALE_REGISTRY"
+expect = "fallback"
+reasons = ["REBINDING"]
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "DEADLINE_EXCEEDED"
+expect = "fallback"
+reasons = ["DEADLINE"]
+
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = "INTERNAL"
+expect = "fallback"
+reasons = ["WORKER_FAILED"]
+
+# A status no ABI version defines, as a newer worker might send: it fails closed, as
+# WORKER_FAILED (sdk-contract §3; shm-abi §12.4 rule 5).
+[[step]]
+do = "call"
+count = 2
+op = "status"
+arg = 77
+expect = "fallback"
+reasons = ["WORKER_FAILED"]
+
+[[step]]
+do = "call"
+count = 100
+
+[[step]]
+do = "wait"
+stat = "deaths"
+max = 0

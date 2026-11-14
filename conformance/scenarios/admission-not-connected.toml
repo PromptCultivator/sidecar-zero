@@ -1,0 +1,22 @@
+name = "NOT_CONNECTED before the sidecar exists"
+covers = ["NOT_CONNECTED"]
+
+[sidecar]
+start = false
+
+[[step]]
+do = "call"
+count = 5
+budget_us = 2000
+expect = "fallback"
+reasons = ["NOT_CONNECTED"]
+
+[[step]]
+do = "start_sidecar"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 100

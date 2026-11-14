@@ -1,0 +1,18 @@
+name = "a supervisor that cannot create its arena starts degraded and recovers"
+
+[sidecar]
+args = ["--test-fail-arena=3"]
+
+[[step]]
+do = "call"
+count = 3
+budget_us = 2000
+expect = "fallback"
+reasons = ["NOT_CONNECTED"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 100

@@ -1,0 +1,24 @@
+name = "a forked child falls back, exits cleanly, and leaves the parent's session alone"
+needs = ["fork"]
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200
+
+[[step]]
+do = "fork"
+reasons = ["NOT_CONNECTED"]
+
+[[step]]
+do = "fork"
+reasons = ["NOT_CONNECTED"]
+
+[[step]]
+do = "call"
+count = 200

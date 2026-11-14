@@ -1,0 +1,20 @@
+name = "a second client is refused and falls back"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "start_agent"
+agent = "b"
+
+[[step]]
+do = "call"
+agent = "b"
+count = 5
+budget_us = 2000
+expect = "fallback"
+reasons = ["NOT_CONNECTED"]
+
+[[step]]
+do = "call"
+count = 100

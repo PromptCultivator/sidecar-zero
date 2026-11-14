@@ -1,0 +1,38 @@
+[package]
+name = "sidecarzero-python"
+description = "The Python SDK's native core: PyO3 bindings over the Rust client (sidecarzero) and the worker core (scz-worker-core)"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+# Excluded from the repository's workspace (root Cargo.toml): a cdylib that links against the
+# interpreter cannot be built as part of the workspace's tests. Its own lockfile and target
+# directory (CARGO_TARGET_DIR=target/python, see build.sh).
+[workspace]
+
+[lib]
+name = "_core"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+# The stable ABI from CPython 3.11, the first release with the buffer protocol in it.
+pyo3 = { version = "=0.30.1", default-features = false, features = ["macros", "abi3-py311"] }
+# The schema fingerprint off Linux, where the Rust client does not build (arrow-data-plane §9).
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+sidecarzero = { path = "../rust" }
+scz-shm = { path = "../../crates/scz-shm" }
+# The worker runner (sdk-python §5): startup, heartbeat, and the consume loop, around a backend
+# that calls the user's Python module.
+scz-worker-core = { path = "../../crates/scz-worker-core" }
+libc = "0.2"
+
+[features]
+crashpoints = ["scz-shm/crashpoints"]
+
+[profile.release]
+debug = 1
+panic = "unwind"

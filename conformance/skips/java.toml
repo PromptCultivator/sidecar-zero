@@ -1,0 +1,3 @@
+# Scenarios the java agent skips, each with the reason (testing §3: never skipped silently).
+[skip]
+"client-fork" = "Java cannot fork without exec: the JVM is multithreaded, and the JDK offers no fork (sdk-contract §7, Fork)"

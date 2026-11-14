@@ -1,0 +1,16 @@
+name = "fault-free load with spinning off: every call answered after parking, no late wake-ups"
+needs = ["nospin"]
+
+# Every caller parks at once, so every answer arrives through a futex wake. Late wake-ups
+# (universal assertion 8) are reported on shared runners and fail with SCZ_STRICT_WAKES=1.
+
+[agent]
+threads = 4
+spin = "off"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 2000

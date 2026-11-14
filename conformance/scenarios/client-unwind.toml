@@ -1,0 +1,19 @@
+name = "a call that unwinds between claiming a ring cell and publishing it leaves a void cell, and the ring keeps moving"
+needs = ["unwind"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "unwind"
+
+# The armed call unwinds out of infer: its cell is published void (one cell moves the ring)
+# and its slot is taken back. The final arena check finds the ring empty and the slot free.
+[[step]]
+do = "call"
+count = 1
+count_publishes = true
+
+[[step]]
+do = "call"
+count = 200

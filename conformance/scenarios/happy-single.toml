@@ -1,0 +1,8 @@
+name = "a single call"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 1

@@ -1,0 +1,50 @@
+name = "a hostile worker leaves a cell sequence number ahead of tail: producers give up in bounded time"
+
+# A targeted pattern of testing §3, "Hostile worker": the cell at each ring's tail given a
+# sequence number ahead of it five times a millisecond, so producers go round until their
+# attempts run out. Every call must return within its bound, and the agent must survive.
+# Then the sidecar is restarted on a clean script, and every assertion holds again.
+# A hostile worker can clear a WAITER bit and so lose a wake-up: late wake-ups are expected.
+stall = true
+
+[sidecar]
+args = ["--model={dir}/model"]
+start = false
+
+[agent]
+threads = 4
+budget_us = 2000
+
+[[step]]
+do = "write"
+path = "model"
+text = "SCZCHAOS-SCRIPT\nscribble_seq=5\n"
+
+[[step]]
+do = "start_sidecar"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 20000
+hostile = true
+
+[[step]]
+do = "write"
+path = "model"
+text = "SCZCHAOS-SCRIPT\n"
+
+[[step]]
+do = "restart_sidecar"
+
+[[step]]
+do = "bound"
+ms = 20000
+
+# Ordinary traffic again, with the ordinary budget.
+[[step]]
+do = "call"
+count = 200
+budget_us = 20000

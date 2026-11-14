@@ -1,0 +1,24 @@
+[package]
+name = "scz-conformance-agent"
+description = "The Rust SDK's conformance agent: a client driven by the runner's line protocol (testing §3)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "scz-agent-rust"
+path = "src/main.rs"
+
+[features]
+# Crash points in the client's stores, for the crash-point harness (testing §2.4).
+crashpoints = ["sidecarzero/crashpoints"]
+
+[dependencies]
+scz-chaos-proto = { path = "../../../conformance/proto" }
+scz-shm = { path = "../../../crates/scz-shm" }
+sidecarzero = { path = ".." }
+libc.workspace = true
+
+[lints]
+workspace = true

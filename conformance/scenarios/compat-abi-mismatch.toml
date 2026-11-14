@@ -1,0 +1,17 @@
+name = "a sidecar that speaks another ABI major: ABI_MISMATCH, logged, the handshake retried later"
+covers = ["ABI_MISMATCH"]
+
+[sidecar]
+args = ["--test-abi-major=9"]
+
+# The first handshake is refused; until then calls fall back with NOT_CONNECTED.
+[[step]]
+do = "sleep"
+ms = 500
+
+[[step]]
+do = "call"
+count = 20
+budget_us = 1000
+expect = "fallback"
+reasons = ["ABI_MISMATCH"]

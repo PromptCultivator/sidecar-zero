@@ -1,0 +1,51 @@
+name = "a frozen worker is condemned while its standby takes over"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[agent]
+threads = 2
+# The freeze is found by the stale heartbeat, about 100 ms in. At 40 ms a call, a caller
+# misses about three times before that, well short of the eight that open its breaker
+# (sdk-contract §4), even when a busy machine delays detection to twice as long.
+budget_us = 40000
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+# Each call takes at least 20 µs in the worker, so the load lasts long enough, in any
+# build profile, for the fault to land in the middle of it.
+count = 5000
+op = "delay"
+arg = 20
+background = true
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "signal"
+target = "active"
+sig = "STOP"
+
+[[step]]
+do = "join"
+
+[[step]]
+do = "wait"
+stat = "condemned"
+min = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

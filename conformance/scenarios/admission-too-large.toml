@@ -1,0 +1,17 @@
+name = "TOO_LARGE for a request no slot class holds"
+covers = ["TOO_LARGE"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 3
+rows = 1000
+expect = "fallback"
+reasons = ["TOO_LARGE"]
+
+[[step]]
+do = "call"
+count = 10
+rows = 100

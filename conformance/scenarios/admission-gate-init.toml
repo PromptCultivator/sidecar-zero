@@ -1,0 +1,24 @@
+name = "GATE_INIT while the model loads"
+covers = ["GATE_INIT"]
+
+[sidecar]
+env = ["SCZ_CHAOS_LOAD_MS=1500"]
+
+[[step]]
+do = "sleep"
+ms = 400
+
+[[step]]
+do = "call"
+count = 5
+budget_us = 2000
+expect = "fallback"
+reasons = ["GATE_INIT", "NOT_CONNECTED"]
+need = ["GATE_INIT"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 100

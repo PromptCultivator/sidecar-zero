@@ -1,0 +1,47 @@
+name = "a requested session reset takes the client out and back"
+allow = ["GATE_RELOADING", "NOT_CONNECTED", "WORKER_FAILED", "GATE_DEAD", "DEADLINE", "GATE_INIT"]
+covers = ["GATE_RELOADING"]
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+# Each call takes at least 20 µs in the worker, so the load lasts long enough, in any
+# build profile, for the fault to land in the middle of it.
+count = 5000
+op = "delay"
+arg = 20
+background = true
+budget_us = 5000
+
+[[step]]
+do = "sleep"
+ms = 30
+
+[[step]]
+do = "ctl"
+cmd = "reset"
+
+[[step]]
+do = "join"
+
+[[step]]
+do = "wait"
+stat = "resets"
+min = 1
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200
+
+[[step]]
+do = "agent_stat"
+stat = "sessions"
+min = 2

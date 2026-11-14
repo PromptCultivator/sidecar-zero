@@ -1,0 +1,44 @@
+name = "a supervisor stopped for a moment: STALE_HEARTBEAT, then answers, with no reconnect"
+covers = ["STALE_HEARTBEAT"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "signal"
+target = "supervisor"
+sig = "STOP"
+
+[[step]]
+do = "sleep"
+ms = 300
+
+[[step]]
+do = "call"
+count = 5
+budget_us = 2000
+expect = "fallback"
+reasons = ["STALE_HEARTBEAT"]
+
+[[step]]
+do = "signal"
+target = "supervisor"
+sig = "CONT"
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 100
+
+[[step]]
+do = "agent_stat"
+stat = "sessions"
+max = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+max = 0

@@ -1,0 +1,11 @@
+name = "concurrent calls from eight threads"
+
+[agent]
+threads = 8
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 500

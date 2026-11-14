@@ -1,0 +1,71 @@
+name = "a reload that changes the schema while the agent sends: nothing encoded for the old registry is answered"
+needs = ["frames"]
+# WORKER_FAILED: on RELEASED the supervisor fails every queued slot (supervisor §5.6), and a
+# FAILED slot is WORKER_FAILED (sdk-contract §3.3). A spinning caller sees the gate first and
+# cancels (GATE_RELOADING); one that had parked, behind an old worker starved by the new one's
+# load, is woken by the failure.
+allow = ["GATE_RELOADING", "REBINDING", "SCHEMA_MISMATCH", "WORKER_FAILED"]
+covers = ["SCHEMA_MISMATCH"]
+
+# The agent's codec is the fraud model's (256 features). The model file is replaced by the
+# 128-feature model under load: every answer that arrives is still the 256-feature model's
+# reference score, and once the new model serves, the codec no longer binds.
+
+[sidecar]
+worker = "sidecarzero-worker"
+args = ["--model={dir}/model.ort"]
+start = false
+
+[agent]
+codec = "features"
+
+[[step]]
+do = "copy"
+from = "{models}/fraud.ort"
+to = "model.ort"
+
+[[step]]
+do = "start_sidecar"
+
+[[step]]
+do = "bound"
+ms = 30000
+
+# The new worker loads its model beside the old one while these calls run, and on a loaded
+# machine an occasional call waited past the default 20 ms budget behind that load. What this
+# scenario checks is which answers arrive, not how fast, so the budget is the sidecar's
+# ceiling (max_deadline_ms, 100 ms); a call that still misses it fails the scenario.
+[[step]]
+do = "call"
+count = 200000
+rows = 1
+budget_us = 100000
+background = true
+
+[[step]]
+do = "sleep"
+ms = 300
+
+[[step]]
+do = "copy"
+from = "{models}/fraud128.ort"
+to = "model.ort"
+
+[[step]]
+do = "ctl"
+cmd = "reload"
+
+[[step]]
+do = "join"
+
+[[step]]
+do = "wait"
+stat = "registry_epoch"
+min = 2
+ms = 30000
+
+[[step]]
+do = "call"
+count = 10
+expect = "fallback"
+reasons = ["SCHEMA_MISMATCH"]

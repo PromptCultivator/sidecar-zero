@@ -1,0 +1,27 @@
+name = "crash at ring.dequeue.after_a"
+crash_at = "ring.dequeue.after_a"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE", "GATE_INIT"]
+
+[agent]
+threads = 2
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200
+expect = "mixed"
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

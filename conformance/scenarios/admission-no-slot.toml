@@ -1,0 +1,37 @@
+name = "every slot held: NO_SLOT at once, without scanning the table"
+covers = ["NO_SLOT"]
+
+# Four slots and eight callers whose calls take 60 ms against a 50 ms budget: while four are
+# queued or being processed, the others find no free slot.
+
+[sidecar]
+args = ["--slots=4"]
+
+[agent]
+threads = 8
+budget_us = 50000
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 3
+op = "delay"
+arg = 60000
+expect = "fallback"
+reasons = ["NO_SLOT", "DEADLINE"]
+need = ["NO_SLOT"]
+
+# The slow requests still queued are dropped or finished; then every slot is free again.
+[[step]]
+do = "sleep"
+ms = 500
+
+[[step]]
+do = "config"
+threads = 1
+
+[[step]]
+do = "call"
+count = 100

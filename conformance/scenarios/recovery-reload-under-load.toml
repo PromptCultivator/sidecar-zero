@@ -1,0 +1,38 @@
+name = "a same-schema reload under load: zero fallbacks"
+
+[agent]
+threads = 3
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+# Each call takes at least 20 µs in the worker, so the load lasts long enough, in any
+# build profile, for the fault to land in the middle of it.
+count = 5000
+op = "delay"
+arg = 20
+background = true
+expect = "model"
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "ctl"
+cmd = "reload"
+
+[[step]]
+do = "join"
+
+[[step]]
+do = "wait"
+stat = "reloads"
+min = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+max = 0

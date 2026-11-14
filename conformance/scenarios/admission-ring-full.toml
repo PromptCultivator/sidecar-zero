@@ -1,0 +1,37 @@
+name = "a full ring: RING_FULL, the slot released"
+covers = ["RING_FULL"]
+
+# A ring of four cells, a worker busy for 60 ms per request, and twelve callers: one request
+# is being processed, four wait in the ring, and the rest find it full.
+
+[sidecar]
+args = ["--ring-capacity=4"]
+
+[agent]
+threads = 12
+budget_us = 50000
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 2
+op = "delay"
+arg = 60000
+expect = "fallback"
+reasons = ["RING_FULL", "DEADLINE"]
+need = ["RING_FULL"]
+
+# The slow requests still queued are dropped or finished; then every slot is free again.
+[[step]]
+do = "sleep"
+ms = 500
+
+[[step]]
+do = "config"
+threads = 1
+
+[[step]]
+do = "call"
+count = 100

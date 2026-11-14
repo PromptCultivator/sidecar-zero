@@ -1,0 +1,31 @@
+name = "the prebuilt dense float32 codec against the fraud model, at one row and in batches"
+needs = ["frames"]
+
+# Every answer must be onnxruntime's reference score for its row, within float tolerance.
+# One row fits the small class; three and thirty-two rows go to the batch class.
+
+[sidecar]
+worker = "sidecarzero-worker"
+args = ["--model={models}/fraud.ort", "--batch-slots=8", "--batch-slot-size=65536", "--batch-resp-cap=4096"]
+
+[agent]
+codec = "features"
+
+[[step]]
+do = "bound"
+ms = 30000
+
+[[step]]
+do = "call"
+count = 64
+rows = 1
+
+[[step]]
+do = "call"
+count = 16
+rows = 3
+
+[[step]]
+do = "call"
+count = 8
+rows = 32

@@ -1,0 +1,3 @@
+# Scenarios the Go agent skips, each with the reason (testing §3: never skipped silently).
+[skip]
+"client-fork" = "Go cannot fork without exec: a forked child of a Go process cannot run Go code (sdk-go §7), so the agent has no fork capability"

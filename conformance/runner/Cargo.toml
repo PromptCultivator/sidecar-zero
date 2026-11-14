@@ -1,0 +1,21 @@
+[package]
+name = "scz-conformance"
+description = "The conformance runner: scenarios against a real supervisor, chaos worker, and an SDK's agent (testing §3)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "scz-conformance"
+path = "src/main.rs"
+
+[dependencies]
+libc.workspace = true
+scz-chaos-proto = { path = "../proto" }
+scz-shm = { path = "../../crates/scz-shm" }
+sidecarzero = { path = "../../sdks/rust" }
+toml.workspace = true
+
+[lints]
+workspace = true

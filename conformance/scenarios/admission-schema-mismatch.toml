@@ -1,0 +1,30 @@
+name = "a codec without the model's schema falls back with SCHEMA_MISMATCH"
+covers = ["SCHEMA_MISMATCH"]
+
+[sidecar]
+worker = "sidecarzero-worker"
+args = ["--model={models}/fraud.ort"]
+
+[[step]]
+do = "wait"
+healthy = true
+ms = 20000
+
+# The agent's codec carries opaque bytes; the fraud model's registry has columns. The first
+# call may find the binding not yet made (REBINDING) and asks the background thread to bind;
+# after that the client is rejected.
+[[step]]
+do = "call"
+count = 1
+expect = "fallback"
+reasons = ["SCHEMA_MISMATCH", "REBINDING"]
+
+[[step]]
+do = "sleep"
+ms = 100
+
+[[step]]
+do = "call"
+count = 5
+expect = "fallback"
+reasons = ["SCHEMA_MISMATCH"]

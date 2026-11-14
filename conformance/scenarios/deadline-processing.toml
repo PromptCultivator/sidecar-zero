@@ -1,0 +1,24 @@
+name = "a worker slower than the deadline: abandoned during PROCESSING"
+covers = ["DEADLINE"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 3
+budget_us = 5000
+op = "delay"
+arg = 50000
+expect = "fallback"
+reasons = ["DEADLINE"]
+
+# The worker finishes the three slow requests (and frees their abandoned slots) before
+# serving again.
+[[step]]
+do = "sleep"
+ms = 300
+
+[[step]]
+do = "call"
+count = 100

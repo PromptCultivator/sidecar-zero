@@ -1,0 +1,32 @@
+name = "the supervisor is killed: a new arena, and the agent reconnects without restarting"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 50
+
+[[step]]
+do = "restart_sidecar"
+
+[[step]]
+do = "sleep"
+ms = 100
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 50
+
+[[step]]
+do = "agent_stat"
+stat = "sessions"
+min = 2
+
+[[step]]
+do = "agent_stat"
+stat = "retired"
+min = 1

@@ -1,0 +1,38 @@
+name = "cold restart without a standby"
+covers = ["GATE_DEAD"]
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE", "GATE_INIT"]
+
+[sidecar]
+args = ["--standby=none", "--backoff-max-ms=100"]
+env = ["SCZ_CHAOS_LOAD_MS=300"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "signal"
+target = "active"
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "call"
+count = 5
+budget_us = 2000
+expect = "fallback"
+reasons = ["GATE_DEAD", "GATE_INIT"]
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

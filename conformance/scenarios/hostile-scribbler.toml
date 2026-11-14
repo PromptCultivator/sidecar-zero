@@ -1,0 +1,53 @@
+name = "a worker that scribbles over rings, slot records, and responses: every call returns in time and the agent survives"
+
+# The chaos worker's script makes it write 10 random words a millisecond over the ring headers
+# and cells, the slot words and records, and the response regions while the agent calls. The
+# outcomes are unconstrained; each call must still return within its budget, plus the
+# tolerance, and the agent must not crash (sdk-contract §11 item 10). Then the sidecar is
+# restarted on a clean script, and every assertion holds again.
+# A hostile worker can clear a WAITER bit and so lose a wake-up: late wake-ups are expected.
+stall = true
+
+[sidecar]
+args = ["--model={dir}/model"]
+start = false
+
+[agent]
+threads = 4
+budget_us = 2000
+
+[[step]]
+do = "write"
+path = "model"
+text = "SCZCHAOS-SCRIPT\nscribble=10\n"
+
+[[step]]
+do = "start_sidecar"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 20000
+hostile = true
+
+[[step]]
+do = "write"
+path = "model"
+text = "SCZCHAOS-SCRIPT\n"
+
+# A new supervisor on the same socket, serving the clean script: the scribbler dies with the
+# old one, and the agent must leave the corrupted arena, unmap it, and reconnect.
+[[step]]
+do = "restart_sidecar"
+
+[[step]]
+do = "bound"
+ms = 20000
+
+# Ordinary traffic again, with the ordinary budget.
+[[step]]
+do = "call"
+count = 200
+budget_us = 20000

@@ -1,0 +1,26 @@
+name = "the worker crashes after writing the response, before DONE"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+op = "crash"
+arg = 2
+budget_us = 200000
+expect = "fallback"
+reasons = ["WORKER_FAILED", "GATE_DEAD"]
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

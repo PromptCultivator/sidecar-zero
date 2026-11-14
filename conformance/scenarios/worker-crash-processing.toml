@@ -1,0 +1,25 @@
+name = "the worker crashes while processing"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+op = "crash"
+arg = 1
+expect = "fallback"
+reasons = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

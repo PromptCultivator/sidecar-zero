@@ -1,0 +1,31 @@
+name = "refused responses condemn the worker"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 20
+op = "bad_len"
+arg = 100000
+expect = "mixed"
+need = ["WORKER_FAILED"]
+
+[[step]]
+do = "wait"
+stat = "refusal_condemns"
+min = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

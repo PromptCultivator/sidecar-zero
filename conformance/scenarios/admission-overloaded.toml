@@ -1,0 +1,34 @@
+name = "callers whose calls keep missing shed with OVERLOADED, claim no slot, publish nothing, then recover"
+covers = ["OVERLOADED"]
+
+# A 3 ms model against a 1 ms budget: the first call is abandoned while the worker processes it,
+# and the worker then drops what it cannot finish (DEADLINE). After eight misses in a row the
+# caller's breaker opens and its calls shed at admission (sdk-contract §4, "Shedding under
+# overload"). The rings must move by exactly the calls that were not shed.
+
+[agent]
+budget_us = 1000
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 300
+op = "delay"
+arg = 3000
+expect = "fallback"
+reasons = ["DEADLINE", "OVERLOADED"]
+need = ["DEADLINE", "OVERLOADED"]
+count_publishes = true
+
+# The breaker's longest interval is 100 ms, jittered up to half again.
+[[step]]
+do = "sleep"
+ms = 200
+
+# The first call probes, is answered, and closes the breaker.
+[[step]]
+do = "call"
+count = 200
+budget_us = 20000

@@ -1,0 +1,46 @@
+name = "standby promotion mid-load"
+allow = ["WORKER_FAILED", "GATE_DEAD", "DEADLINE"]
+
+[agent]
+threads = 4
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+# Each call takes at least 20 µs in the worker, so the load lasts long enough, in any
+# build profile, for the fault to land in the middle of it.
+count = 5000
+op = "delay"
+arg = 20
+background = true
+
+[[step]]
+do = "sleep"
+ms = 50
+
+[[step]]
+do = "signal"
+target = "active"
+
+[[step]]
+do = "join"
+
+[[step]]
+do = "wait"
+stat = "promotions"
+min = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

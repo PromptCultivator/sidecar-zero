@@ -1,0 +1,31 @@
+name = "a hung inference is condemned after its caller gave up"
+
+[sidecar]
+args = ["--max-deadline-ms=100"]
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+op = "hang"
+expect = "fallback"
+reasons = ["DEADLINE"]
+
+[[step]]
+do = "wait"
+stat = "condemned"
+min = 1
+
+[[step]]
+do = "wait"
+stat = "deaths"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 200

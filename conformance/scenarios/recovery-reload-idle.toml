@@ -1,0 +1,25 @@
+name = "a reload on an idle pod wakes the parked worker"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "sleep"
+ms = 200
+
+[[step]]
+do = "ctl"
+cmd = "reload"
+
+[[step]]
+do = "wait"
+stat = "reloads"
+min = 1
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 100

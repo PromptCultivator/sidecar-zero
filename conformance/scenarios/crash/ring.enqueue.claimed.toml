@@ -1,0 +1,39 @@
+name = "the client crashes at ring.enqueue.claimed"
+crash_at = "ring.enqueue.claimed"
+crash_in = "agent"
+
+[agent]
+start = false
+
+[[step]]
+do = "start_agent"
+agent = "victim"
+crash = true
+
+[[step]]
+do = "bound"
+agent = "victim"
+
+[[step]]
+do = "call"
+agent = "victim"
+background = true
+
+[[step]]
+do = "agent_died"
+agent = "victim"
+
+[[step]]
+do = "wait"
+stat = "resets"
+min = 1
+
+[[step]]
+do = "start_agent"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 200

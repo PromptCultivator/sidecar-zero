@@ -1,0 +1,49 @@
+name = "a fallback that throws: infer fails, and the slot was already released"
+needs = ["throws"]
+
+[agent]
+fallback = "throws"
+
+[[step]]
+do = "bound"
+
+# A status from a DONE slot, an abandon at the deadline, and a codec failure, each falling
+# back through a fallback that throws. The arena check at the end finds every slot free.
+[[step]]
+do = "call"
+count = 5
+op = "status"
+arg = "MODEL_ERROR"
+expect = "fallback"
+reasons = ["MODEL_ERROR"]
+
+[[step]]
+do = "call"
+count = 5
+budget_us = 1000
+op = "delay"
+arg = 5000
+expect = "fallback"
+reasons = ["DEADLINE"]
+
+[[step]]
+do = "codec_fault"
+mode = "encode"
+
+[[step]]
+do = "call"
+count = 5
+expect = "fallback"
+reasons = ["CODEC_ERROR"]
+
+[[step]]
+do = "codec_fault"
+mode = "off"
+
+[[step]]
+do = "config"
+fallback = "constant"
+
+[[step]]
+do = "call"
+count = 100

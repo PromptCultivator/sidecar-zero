@@ -1,0 +1,3 @@
+# Scenarios the Rust agent skips, each with the reason (testing §3: never skipped silently).
+[skip]
+"client-clock-skew" = "the Rust SDK reads CLOCK_MONOTONIC directly; it has no cheap clock to skew"

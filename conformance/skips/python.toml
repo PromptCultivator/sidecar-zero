@@ -1,0 +1,3 @@
+# Scenarios the python agent skips, each with the reason (testing §3: never skipped silently).
+[skip]
+"client-clock-skew" = "the Python SDK reads CLOCK_MONOTONIC through the Rust core on every call; it has no cheap clock to skew, and never raises CLOCK_FAULT (cap cheap-clock)"

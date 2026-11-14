@@ -1,0 +1,93 @@
+name = "the memory relief ladder over fake cgroup files: retire the standby, shed, recover"
+covers = ["GATE_SHEDDING"]
+
+[sidecar]
+start = false
+args = ["--cgroup={dir}/cgroup"]
+
+# A 1 GiB limit at 10% use, no pressure, never throttled.
+[[step]]
+do = "write"
+path = "cgroup/memory.max"
+text = "1073741824"
+
+[[step]]
+do = "write"
+path = "cgroup/memory.current"
+text = "107374182"
+
+[[step]]
+do = "write"
+path = "cgroup/memory.stat"
+text = "anon 0\ninactive_file 0\n"
+
+[[step]]
+do = "write"
+path = "cgroup/memory.pressure"
+text = "some avg10=0.00 avg60=0.00 avg300=0.00 total=0\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n"
+
+[[step]]
+do = "write"
+path = "cgroup/cpu.stat"
+text = "usage_usec 0\nnr_periods 0\nnr_throttled 0\n"
+
+[[step]]
+do = "start_sidecar"
+
+[[step]]
+do = "bound"
+
+[[step]]
+do = "call"
+count = 100
+
+# Above 0.85: the warm standby is retired first, and serving goes on.
+[[step]]
+do = "write"
+path = "cgroup/memory.current"
+text = "966367641"
+
+[[step]]
+do = "wait"
+stat = "retired_standbys"
+min = 1
+
+[[step]]
+do = "call"
+count = 100
+
+# Above 0.95: shed. New calls fall back at admission.
+[[step]]
+do = "write"
+path = "cgroup/memory.current"
+text = "1041529569"
+
+[[step]]
+do = "wait"
+stat = "shedding"
+min = 1
+
+[[step]]
+do = "call"
+count = 5
+expect = "fallback"
+reasons = ["GATE_SHEDDING"]
+
+# Below 0.75 for the recovery hold: the gate reopens.
+[[step]]
+do = "write"
+path = "cgroup/memory.current"
+text = "536870912"
+
+[[step]]
+do = "wait"
+healthy = true
+
+[[step]]
+do = "call"
+count = 100
+
+[[step]]
+do = "wait"
+stat = "deaths"
+max = 0
