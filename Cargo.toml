@@ -1,0 +1,51 @@
+[workspace]
+resolver = "2"
+# The Python SDK is a PyO3 extension with its own lockfile and target directory: its cdylib
+# cannot link as a test of the workspace.
+exclude = ["fuzz", "sdks/python"]
+members = [
+    "conformance/proto",
+    "conformance/runner",
+    "crates/scz-abi-gen",
+    "crates/scz-ctl",
+    "crates/scz-shm",
+    "crates/scz-supervisor",
+    "crates/scz-worker-core",
+    "crates/scz-worker-gguf",
+    "crates/scz-worker-ort",
+    "bench/chaos",
+    "bench/common",
+    "bench/host",
+    "bench/loadgen",
+    "bench/server",
+    "bench/triton-client",
+    "deploy/demo-host",
+    "sdks/rust",
+    "sdks/rust/conformance-agent",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+# Pinned to the release spike S4 tested template frames with.
+arrow-array = "=60.1.0"
+arrow-buffer = "=60.1.0"
+arrow-data = "=60.1.0"
+arrow-ipc = "=60.1.0"
+arrow-schema = "=60.1.0"
+sha2 = "0.10"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+libc = "0.2"
+loom = "0.7"
+toml = { version = "0.8", features = ["preserve_order"] }
+
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(loom)'] }
+unsafe_op_in_unsafe_fn = "deny"
+
+[profile.release]
+debug = 1

@@ -1,0 +1,501 @@
+# SidecarZero arena ABI — the normative layout.
+#
+# Every offset, size, enum value, and bit field of the shared-memory protocol is defined here
+# and nowhere else. `scz-abi-gen` turns this file into constants and field accessors for each
+# language; `abi/golden/generate.py` reads it, independently of any Rust code, to write the
+# golden arena images that every implementation must reproduce.
+#
+# Prose description: docs/components/01-shm-abi.md. Where the two disagree, this file wins
+# and the document is wrong.
+#
+# Field keys:
+#   off     byte offset within the region
+#   ty      u8 | u16 | u32 | u64 | bytes<N>
+#   access  how every implementation must read and write the field:
+#             const    written once, before the segment is shared; read with a relaxed load
+#             relaxed  read and written with relaxed atomic operations (observability, echoes,
+#                      and fields published by a later release store on another word)
+#             acqrel   stores are release, loads are acquire
+#             cas      as acqrel, and changed only by compare-and-swap or atomic RMW
+#   writer  the one role that writes it: supervisor | worker | client | contended | kernel
+
+[abi]
+major = 1          # frozen (shm-abi §12): a change that is not additive is a new major
+minor = 0          # the newest minor readers generated from this file know
+min_minor = 0      # the oldest they accept: HELLO offers min_minor..minor (shm-abi §8)
+
+[constants]
+CTL_HEADER_LEN = 4096
+CTL_REGISTRY_LEN = 65536     # the control segment is CTL_HEADER_LEN + CTL_REGISTRY_LEN bytes
+STATUS_PAGE_LEN = 4096
+RING_HEADER_LEN = 256
+CELL_LEN = 64
+SLOT_RECORD_LEN = 64
+MSG_LEN = 64
+WORKER_SEGMENT_LEN = 4096
+MAX_RINGS = 8
+MAX_SLAB_CLASSES = 8
+BEAT_SLOTS = 2
+ENQUEUE_ATTEMPTS = 64        # shm-abi §4.3: then the ring counts as full
+CAS_ATTEMPTS = 64            # shm-abi §6.1: then the transition is void
+SLOT_PROBE = 16              # shm-abi §5.3
+CTL_MAGIC = 0x414E4552415A4353    # "SCZARENA", little-endian
+DATA_MAGIC = 0x00415441445A4353   # "SCZDATA\0", little-endian
+MSG_MAGIC = 0x315A4353            # "SCZ1", little-endian
+REGISTRY_MAGIC = 0x000047455A524353  # "SCZREG\0\0", little-endian (arrow-data-plane §4)
+MAX_TEMPLATES = 16           # one request and one response template per slot class
+MAX_COLUMNS = 64             # per template
+MAX_PATCHES = 256            # per template
+
+# Defaults written into CONFIG; a supervisor may override them per arena.
+[defaults]
+hb_interval_ns = 5_000_000
+hb_stale_ns = 15_000_000
+spin_ns = 50_000
+default_deadline_ns = 2_000_000
+max_deadline_ns = 100_000_000
+
+# ── Enumerations ────────────────────────────────────────────────────────────────────────
+[enums.gate_state]
+INIT = 0
+HEALTHY = 1
+PSI_SHEDDING = 2
+RELOADING = 3
+DEAD = 4
+DRAINING = 5
+
+[enums.gate_reason]
+NONE = 0
+WORKER_EXIT = 1
+WORKER_STALE = 2
+WORKER_HUNG = 3
+BAD_RESPONSES = 4
+MEMORY = 5
+DOES_NOT_FIT = 6
+RELOAD = 7
+ROLLBACK = 8
+SESSION_RESET = 9
+NO_MODEL = 10
+
+[enums.slot_state]
+FREE = 0
+CLAIMED = 1
+READY = 2
+PROCESSING = 3
+DONE = 4
+FAILED = 5
+ABANDONED = 6
+
+[enums.beat_state]
+EMPTY = 0
+LOADING = 1
+WARM = 2
+ACTIVE = 3
+DRAINING = 4
+RELEASED = 5
+
+[enums.status]             # slot record `status`, written by the worker with DONE
+OK = 0
+DEADLINE_EXCEEDED = 1
+BAD_REQUEST = 2
+MODEL_ERROR = 3
+RESOURCE_EXHAUSTED = 4
+STALE_REGISTRY = 5
+INTERNAL = 6
+
+[enums.consumer_wait]
+AWAKE = 0
+PARKED = 1
+WAKING = 2
+
+[enums.ring_kind]
+MPSC = 1
+SPSC = 2                   # reserved
+
+[enums.ctl_bit]            # ctl_req and ctl_ack are bitsets of these
+TRIM = 0x1
+DRAIN = 0x2
+HANDOVER = 0x4
+DUMP_STATS = 0x8
+
+[enums.cell_flag]
+ASYNC = 0x1                # reserved for v1.x
+VOID = 0x2                 # the producer could not fill the cell; the consumer skips it
+
+[enums.msg_kind]
+HELLO = 1
+WELCOME = 2
+READY = 3
+
+[enums.welcome_status]
+OK = 0
+ABI_MISMATCH = 1
+BUSY = 2
+DENIED = 3
+
+[enums.sdk_lang]
+RUST = 1
+JAVA = 2
+CPP = 3
+GO = 4
+PYTHON = 5
+
+[enums.elem_type]          # ColumnDesc.elem_type: the physical type of a column's values
+I8 = 1
+I16 = 2
+I32 = 3
+I64 = 4
+U8 = 5
+U16 = 6
+U32 = 7
+U64 = 8
+F16 = 9
+F32 = 10
+F64 = 11
+FIXED_BINARY = 12           # list_size is the byte width
+
+[enums.direction]          # TemplateDesc.direction
+REQUEST = 1
+RESPONSE = 2
+
+[enums.patch_kind]         # PatchDesc.kind: how a length field follows the row count
+ROWS_SCALED = 1             # value = rows × scale
+BITMAP_BYTES = 2            # value = ceil(rows / 8)
+
+[enums.status_byte]        # one byte per event on a worker's status pipe
+WARM = 0x57                # 'W'
+ACTIVE = 0x41              # 'A'
+DRAINED = 0x44             # 'D'
+RELEASED = 0x52            # 'R'
+
+# ── Bit fields inside one atomic word ───────────────────────────────────────────────────
+[bitfields.slot_word]      # [ epoch:32 | reserved:21 | OWNER:2 | WAITER:1 | state:8 ]
+state = [0, 8]
+waiter = [8, 1]
+owner = [9, 2]
+epoch = [32, 32]
+
+[bitfields.gate_word]      # [ worker_gen:32 | shed_permille:16 | reason:8 | state:8 ]
+state = [0, 8]
+reason = [8, 8]
+shed_permille = [16, 16]
+worker_gen = [32, 32]
+
+# ── Regions ─────────────────────────────────────────────────────────────────────────────
+# A region is a fixed-size block. `segment` says where it lives; repeated regions appear as
+# arrays in their parent (see `arrays`).
+
+[regions.control_header]
+segment = "control"
+size = 4096
+fields = [
+  { name = "magic",                 off = 0x000, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "abi_major",             off = 0x008, ty = "u16",      access = "const",   writer = "supervisor" },
+  { name = "abi_minor",             off = 0x00A, ty = "u16",      access = "const",   writer = "supervisor" },
+  { name = "header_len",            off = 0x00C, ty = "u32",      access = "const",   writer = "supervisor" },
+  { name = "data_len",              off = 0x010, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "arena_id",              off = 0x018, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "layout_crc32c",         off = 0x020, ty = "u32",      access = "const",   writer = "supervisor" },
+  { name = "ctl_len",               off = 0x024, ty = "u32",      access = "const",   writer = "supervisor" },
+  { name = "page_size",             off = 0x028, ty = "u32",      access = "const",   writer = "supervisor" },
+  { name = "ring_count",            off = 0x02C, ty = "u16",      access = "const",   writer = "supervisor" },
+  { name = "slab_class_count",      off = 0x02E, ty = "u16",      access = "const",   writer = "supervisor" },
+  { name = "feature_flags",         off = 0x030, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "created_mono_ns",       off = 0x038, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "gate",                  off = 0x040, ty = "u64",      access = "acqrel",  writer = "supervisor" },
+  { name = "supervisor_hb_mono_ns", off = 0x048, ty = "u64",      access = "relaxed", writer = "supervisor" },
+  { name = "gate_changed_mono_ns",  off = 0x050, ty = "u64",      access = "relaxed", writer = "supervisor" },
+  { name = "session_epoch",         off = 0x058, ty = "u64",      access = "acqrel",  writer = "supervisor" },
+  { name = "ctl_req",               off = 0x080, ty = "u32",      access = "acqrel",  writer = "supervisor" },
+  { name = "standby_wait",          off = 0x084, ty = "u32",      access = "cas",     writer = "supervisor" },
+  { name = "spin_ceiling_ns",       off = 0x088, ty = "u64",      access = "relaxed", writer = "supervisor" },
+  { name = "model_seq",             off = 0x100, ty = "u64",      access = "acqrel",  writer = "supervisor" },
+  { name = "model_sha256",          off = 0x108, ty = "bytes32",  access = "relaxed", writer = "supervisor" },
+  { name = "model_gen",             off = 0x128, ty = "u32",      access = "relaxed", writer = "supervisor" },
+  { name = "registry_epoch",        off = 0x12C, ty = "u32",      access = "relaxed", writer = "supervisor" },
+  { name = "schema_fingerprint",    off = 0x130, ty = "u64",      access = "relaxed", writer = "supervisor" },
+  { name = "registry_off",          off = 0x138, ty = "u32",      access = "relaxed", writer = "supervisor" },
+  { name = "registry_len",          off = 0x13C, ty = "u32",      access = "relaxed", writer = "supervisor" },
+  { name = "hb_interval_ns",        off = 0x200, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "hb_stale_ns",           off = 0x208, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "spin_ns",               off = 0x210, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "default_deadline_ns",   off = 0x218, ty = "u64",      access = "const",   writer = "supervisor" },
+  { name = "max_deadline_ns",       off = 0x220, ty = "u64",      access = "const",   writer = "supervisor" },
+]
+arrays = [
+  { name = "ring_dir", region = "ring_dir_entry", off = 0x400, count = 8, stride = 32 },
+  { name = "slab_dir", region = "slab_dir_entry", off = 0x500, count = 8, stride = 64 },
+  { name = "data_map", region = "data_map",       off = 0x700, count = 1, stride = 32 },
+]
+# layout_crc32c: CRC-32C (Castagnoli, reflected, init and final xor 0xFFFFFFFF) over these
+# byte ranges of the control header, concatenated, with layout_crc32c itself read as zero.
+crc_ranges = [[0x000, 0x040], [0x200, 0x800]]
+
+[regions.ring_dir_entry]
+segment = "control"
+size = 32
+fields = [
+  { name = "ring_off",    off = 0x00, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "capacity",    off = 0x08, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "kind",        off = 0x0C, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "cell_stride", off = 0x10, ty = "u32", access = "const", writer = "supervisor" },
+]
+
+[regions.slab_dir_entry]
+segment = "control"
+size = 64
+fields = [
+  { name = "table_off",     off = 0x00, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "data_off",      off = 0x08, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "slot_size",     off = 0x10, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "slot_count",    off = 0x14, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "req_cap",       off = 0x18, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "resp_cap",      off = 0x1C, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "req_template",  off = 0x20, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "resp_template", off = 0x22, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "record_stride", off = 0x24, ty = "u16", access = "const", writer = "supervisor" },
+]
+
+[regions.data_map]
+segment = "control"
+size = 32
+fields = [
+  { name = "status_off",  off = 0x00, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "staging_off", off = 0x08, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "staging_len", off = 0x10, ty = "u32", access = "const", writer = "supervisor" },
+]
+
+[regions.status_page]
+segment = "data"
+size = 4096
+fields = [
+  { name = "magic",              off = 0x000, ty = "u64", access = "const",   writer = "supervisor" },
+  { name = "arena_id",           off = 0x008, ty = "u64", access = "const",   writer = "supervisor" },
+  { name = "client_rejects",     off = 0x0C0, ty = "u64", access = "cas",     writer = "client" },
+  { name = "client_ring_faults", off = 0x0C8, ty = "u64", access = "cas",     writer = "client" },
+]
+arrays = [
+  { name = "beat", region = "beat", off = 0x040, count = 2, stride = 64 },
+  { name = "worker_stats", region = "worker_stats", off = 0x800, count = 2, stride = 0x400 },
+]
+
+[regions.worker_stats]     # observability only: one per beat slot, written by that worker's consume threads
+segment = "data"
+size = 0x400
+fields = [
+  { name = "served",           off = 0x00, ty = "u64", access = "cas", writer = "worker", note = "requests completed OK" },
+  { name = "deadline_drops",   off = 0x08, ty = "u64", access = "cas", writer = "worker", note = "completed DEADLINE_EXCEEDED without running the model" },
+  { name = "bad_requests",     off = 0x10, ty = "u64", access = "cas", writer = "worker" },
+  { name = "stale_requests",   off = 0x18, ty = "u64", access = "cas", writer = "worker", note = "completed STALE_REGISTRY" },
+  { name = "model_errors",     off = 0x20, ty = "u64", access = "cas", writer = "worker", note = "MODEL_ERROR or RESOURCE_EXHAUSTED" },
+  { name = "copies",           off = 0x28, ty = "u64", access = "cas", writer = "worker", note = "requests whose tensors were copied: padding to a fixed batch" },
+  { name = "zero_copy_misses", off = 0x30, ty = "u64", access = "cas", writer = "worker", note = "the runtime did not read or write slot memory in place" },
+  { name = "infer_ns",         off = 0x38, ty = "u64", access = "cas", writer = "worker", note = "total time inside the backend" },
+]
+
+[regions.beat]
+segment = "data"
+size = 64
+fields = [
+  { name = "hb_mono_ns", off = 0x00, ty = "u64", access = "relaxed", writer = "worker" },
+  { name = "pid",        off = 0x08, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "gen",        off = 0x0C, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "state",      off = 0x10, ty = "u32", access = "acqrel",  writer = "worker" },
+  { name = "ctl_ack",    off = 0x14, ty = "u32", access = "acqrel",  writer = "worker" },
+  { name = "staged_len", off = 0x18, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "completed",  off = 0x20, ty = "u64", access = "relaxed", writer = "worker", note = "slots completed with DONE; the denominator of the refusal rule (supervisor §5.2)" },
+]
+
+[regions.ring_header]
+segment = "data"
+size = 256
+fields = [
+  { name = "ring_id",       off = 0x00, ty = "u32", access = "const",  writer = "supervisor" },
+  { name = "tail",          off = 0x40, ty = "u64", access = "cas",    writer = "contended" },
+  { name = "head",          off = 0x80, ty = "u64", access = "acqrel", writer = "worker" },
+  { name = "consumer_wait", off = 0xC0, ty = "u32", access = "cas",    writer = "contended" },
+]
+cells_off = 0x100
+
+[regions.cell]
+segment = "data"
+size = 64
+fields = [
+  { name = "seq",             off = 0x00, ty = "u64", access = "acqrel",  writer = "contended" },
+  { name = "request_id",      off = 0x08, ty = "u64", access = "relaxed", writer = "client", note = "echo, for tracing" },
+  { name = "slot_index",      off = 0x1C, ty = "u32", access = "relaxed", writer = "client" },
+  { name = "deadline_mono_ns",off = 0x20, ty = "u64", access = "relaxed", writer = "client" },
+  { name = "slot_epoch",      off = 0x28, ty = "u32", access = "relaxed", writer = "client" },
+  { name = "slab_class",      off = 0x2C, ty = "u16", access = "relaxed", writer = "client" },
+  { name = "enqueue_mono_ns", off = 0x30, ty = "u64", access = "relaxed", writer = "client", note = "echo, for tracing" },
+  { name = "flags",           off = 0x38, ty = "u32", access = "relaxed", writer = "client" },
+  { name = "route",           off = 0x3C, ty = "u32", access = "relaxed", writer = "client" },
+]
+
+[regions.slot_record]
+segment = "data"
+size = 64
+fields = [
+  { name = "word",         off = 0x00, ty = "u64", access = "cas",     writer = "contended" },
+  { name = "request_id",   off = 0x08, ty = "u64", access = "relaxed", writer = "client" },
+  { name = "req_len",      off = 0x10, ty = "u32", access = "relaxed", writer = "client" },
+  { name = "resp_len",     off = 0x14, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "status",       off = 0x18, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "model_gen",    off = 0x1C, ty = "u32", access = "relaxed", writer = "worker" },
+  { name = "t_enqueue_ns", off = 0x20, ty = "u64", access = "relaxed", writer = "client" },
+  { name = "t_dequeue_ns", off = 0x28, ty = "u64", access = "relaxed", writer = "worker" },
+  { name = "t_done_ns",    off = 0x30, ty = "u64", access = "relaxed", writer = "worker" },
+  { name = "req_stamp",    off = 0x38, ty = "u32", access = "relaxed", writer = "client" },
+  { name = "resp_stamp",   off = 0x3C, ty = "u32", access = "relaxed", writer = "worker" },
+]
+
+[regions.worker_segment]   # one per worker, shared with the supervisor only (shm-abi §2)
+segment = "worker"
+size = 4096
+fields = []
+arrays = [
+  { name = "death_lock", region = "death_lock", off = 0x000, count = 8, stride = 64 },
+]
+
+[regions.death_lock]
+segment = "worker"
+size = 64
+fields = [
+  { name = "futex_word", off = 0x00, ty = "u32", access = "cas", writer = "kernel", note = "owner tid | FUTEX_WAITERS | FUTEX_OWNER_DIED" },
+]
+
+# ── The registry (arrow-data-plane §4) ──────────────────────────────────────────────────
+# Lives in the control segment at registry_off (written only by the supervisor), and is
+# staged by a worker in staging[beat_slot] of the data segment. Every offset inside it is
+# relative to the start of the registry; every structure is fixed-size and naturally aligned,
+# with its stride in the header so that a minor version can extend it.
+[regions.registry_header]
+segment = "registry"
+size = 64
+fields = [
+  { name = "magic",           off = 0x00, ty = "u64", access = "const", writer = "supervisor", note = "REGISTRY_MAGIC" },
+  { name = "registry_len",    off = 0x08, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "template_count",  off = 0x0C, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "template_stride", off = 0x0E, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "column_stride",   off = 0x10, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "patch_stride",    off = 0x12, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "in_schema_off",   off = 0x14, ty = "u32", access = "const", writer = "supervisor", note = "Arrow IPC Schema message for requests" },
+  { name = "in_schema_len",   off = 0x18, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "out_schema_off",  off = 0x1C, ty = "u32", access = "const", writer = "supervisor", note = "Arrow IPC Schema message for responses" },
+  { name = "out_schema_len",  off = 0x20, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "templates_off",   off = 0x24, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "columns_off",     off = 0x28, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "patches_off",     off = 0x2C, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "names_off",       off = 0x30, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "names_len",       off = 0x34, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "column_total",    off = 0x38, ty = "u32", access = "const", writer = "supervisor", note = "ColumnDesc entries, over all templates" },
+  { name = "patch_total",     off = 0x3C, ty = "u32", access = "const", writer = "supervisor", note = "PatchDesc entries, over all templates" },
+]
+
+[regions.template_desc]
+segment = "registry"
+size = 48
+fields = [
+  { name = "template_id",    off = 0x00, ty = "u16", access = "const", writer = "supervisor", note = "never 0" },
+  { name = "direction",      off = 0x02, ty = "u8",  access = "const", writer = "supervisor" },
+  { name = "flags",          off = 0x03, ty = "u8",  access = "const", writer = "supervisor" },
+  { name = "slab_class",     off = 0x04, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "column_count",   off = 0x06, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "max_rows",       off = 0x08, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "prefix_off",     off = 0x0C, ty = "u32", access = "const", writer = "supervisor", note = "the pre-rendered metadata bytes, within the registry" },
+  { name = "prefix_len",     off = 0x10, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "body_off",       off = 0x14, ty = "u32", access = "const", writer = "supervisor", note = "from the start of the region" },
+  { name = "frame_cap",      off = 0x18, ty = "u32", access = "const", writer = "supervisor", note = "total bytes of the frame; constant for the template" },
+  { name = "first_column",   off = 0x1C, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "first_patch",    off = 0x20, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "patch_count",    off = 0x24, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "rows_field_off", off = 0x28, ty = "u32", access = "const", writer = "supervisor", note = "where the row count sits in the prefix" },
+]
+
+[regions.column_desc]
+segment = "registry"
+size = 32
+fields = [
+  { name = "values_off",     off = 0x00, ty = "u32", access = "const", writer = "supervisor", note = "from the start of the region" },
+  { name = "row_bytes",      off = 0x04, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "validity_off",   off = 0x08, ty = "u32", access = "const", writer = "supervisor", note = "0 if non-nullable" },
+  { name = "null_count_off", off = 0x0C, ty = "u32", access = "const", writer = "supervisor", note = "in the prefix; 0 if non-nullable" },
+  { name = "list_size",      off = 0x10, ty = "u32", access = "const", writer = "supervisor", note = "1 for scalars; N for FixedSizeList<T>[N]; the byte width for FIXED_BINARY" },
+  { name = "name_off",       off = 0x14, ty = "u32", access = "const", writer = "supervisor", note = "into the names area" },
+  { name = "name_len",       off = 0x18, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "elem_type",      off = 0x1A, ty = "u8",  access = "const", writer = "supervisor" },
+  { name = "nullable",       off = 0x1B, ty = "u8",  access = "const", writer = "supervisor" },
+]
+
+[regions.patch_desc]
+segment = "registry"
+size = 12
+fields = [
+  { name = "prefix_off", off = 0x00, ty = "u32", access = "const", writer = "supervisor", note = "an 8-byte length field in the prefix" },
+  { name = "scale",      off = 0x04, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "kind",       off = 0x08, ty = "u8",  access = "const", writer = "supervisor" },
+]
+
+# ── Handshake messages (SOCK_SEQPACKET, one message per datagram, little-endian) ─────────
+[regions.msg_hello]
+segment = "message"
+size = 64
+fields = [
+  { name = "magic",         off = 0x00, ty = "u32", access = "const", writer = "client" },
+  { name = "kind",          off = 0x04, ty = "u32", access = "const", writer = "client" },
+  { name = "abi_major",     off = 0x08, ty = "u16", access = "const", writer = "client" },
+  { name = "abi_minor_min", off = 0x0A, ty = "u16", access = "const", writer = "client" },
+  { name = "abi_minor_max", off = 0x0C, ty = "u16", access = "const", writer = "client" },
+  { name = "sdk_lang",      off = 0x0E, ty = "u16", access = "const", writer = "client" },
+  { name = "sdk_version",   off = 0x10, ty = "u32", access = "const", writer = "client" },
+  { name = "pid",           off = 0x14, ty = "u32", access = "const", writer = "client" },
+  { name = "flags",         off = 0x18, ty = "u64", access = "const", writer = "client" },
+]
+
+[regions.msg_welcome]
+segment = "message"
+size = 64
+fields = [
+  { name = "magic",      off = 0x00, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "kind",       off = 0x04, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "status",     off = 0x08, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "abi_major",  off = 0x0C, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "abi_minor",  off = 0x0E, ty = "u16", access = "const", writer = "supervisor" },
+  { name = "ctl_len",    off = 0x10, ty = "u32", access = "const", writer = "supervisor" },
+  { name = "data_len",   off = 0x18, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "arena_id",   off = 0x20, ty = "u64", access = "const", writer = "supervisor" },
+  { name = "session_id", off = 0x28, ty = "u64", access = "const", writer = "supervisor" },
+]
+
+[regions.msg_ready]
+segment = "message"
+size = 64
+fields = [
+  { name = "magic",    off = 0x00, ty = "u32", access = "const", writer = "client" },
+  { name = "kind",     off = 0x04, ty = "u32", access = "const", writer = "client" },
+  { name = "arena_id", off = 0x08, ty = "u64", access = "const", writer = "client" },
+]
+
+# ── Data-segment layout rule ────────────────────────────────────────────────────────────
+# How a supervisor places regions in the data segment. scz-shm and the golden generator
+# each implement it, separately:
+#   1. status page at 0, STATUS_PAGE_LEN bytes;
+#   2. registry staging next: BEAT_SLOTS × staging_len;
+#   3. each ring next, in order, starting on a page boundary: RING_HEADER_LEN + capacity × CELL_LEN;
+#   4. each slab class next, in order: its slot table on a page boundary (slot_count ×
+#      SLOT_RECORD_LEN), then its slot data on a page boundary (slot_count × slot_size);
+#   5. data_len is the smallest power of two not below the end of the last region.
+# Every ring cell starts with seq = its index; every other byte of the data segment is zero,
+# except the status page's magic and arena_id and each ring header's ring_id (its index).
+# In the control segment, IDENT, CONFIG, and DIRECTORY are written; everything else starts
+# at zero, including the gate (INIT, generation 0) and every runtime field.
+[layout]
+page = 4096
+
+# ── The arena the golden images are made from ───────────────────────────────────────────
+[golden]
+arena_id = 0x0123456789ABCDEF
+created_mono_ns = 1
+staging_len = 0x10000
+rings = [ { capacity = 8 } ]
+slab_classes = [ { slot_size = 4096, slot_count = 16, req_cap = 2048, resp_cap = 2048 } ]

@@ -1,0 +1,63 @@
+[package]
+name = "scz-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+scz-shm = { path = "../crates/scz-shm" }
+
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "supervisor_sweep"
+path = "fuzz_targets/supervisor_sweep.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "worker_consume"
+path = "fuzz_targets/worker_consume.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "directory"
+path = "fuzz_targets/directory.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "handshake"
+path = "fuzz_targets/handshake.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "registry"
+path = "fuzz_targets/registry.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "admin"
+path = "fuzz_targets/admin.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "http"
+path = "fuzz_targets/http.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "arrow_ipc"
+path = "fuzz_targets/arrow_ipc.rs"
+test = false
+doc = false

@@ -1,0 +1,21 @@
+/target
+/deploy/docker/.stage
+/deploy/helm-kep753/examples/*/charts/
+/bench/docker/.stage
+/bench/results/
+/bench/baselines/triton/.repository/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Agent configurations and transcripts
+.agents/
+.agent/
+.claude/
+.gemini/
+.cursor/
+.codex/
+.system_generated/
+transcript.jsonl
+transcript_full.jsonl
+*transcript*.jsonl

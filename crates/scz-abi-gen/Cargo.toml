@@ -1,0 +1,13 @@
+[package]
+name = "scz-abi-gen"
+description = "Generates constants and field accessors for every language from abi/scz_abi.toml"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+toml.workspace = true
+
+[lints]
+workspace = true
