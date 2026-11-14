@@ -1,0 +1,6 @@
+.tools/
+target/
+build/
+*.o
+*.class
+__pycache__/

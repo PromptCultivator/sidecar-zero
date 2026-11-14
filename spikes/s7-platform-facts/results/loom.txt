@@ -1,0 +1,20 @@
+Unable to find image 'rust:1' locally
+1: Pulling from library/rust
+5fb8a572c9d4: Pulling fs layer
+dec0004e5ff8: Download complete
+5fb8a572c9d4: Download complete
+e824b010cb4d: Download complete
+5fb8a572c9d4: Pull complete
+Digest: sha256:8a4e90c7946b74626488b1446f712c0fe0ed1a596cbd3d871684bc9c5433ae07
+Status: Downloaded newer image for rust:1
+warning: `s7-loom` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 5.04s
+  Executable unittests src/lib.rs (/tmp/target/release/deps/s7_loom-9e0115734c5c293c)
+LOOM seqcst_store_seqcst_load: REJECTED by loom
+    thread 'tests::seqcst_store_seqcst_load' (472) panicked at src/lib.rs:43:13:
+    lost wake-up: the consumer saw no request and the producer saw nobody parked
+LOOM release_store_fence_acquire_load: accepted by loom
+LOOM release_store_acquire_load_no_fence: REJECTED by loom
+    thread 'tests::release_store_acquire_load_no_fence' (506) panicked at src/lib.rs:43:13:
+    lost wake-up: the consumer saw no request and the producer saw nobody parked
+LOOM relaxed_store_fence_relaxed_load: accepted by loom

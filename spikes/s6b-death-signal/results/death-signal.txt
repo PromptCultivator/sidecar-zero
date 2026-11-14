@@ -1,0 +1,14 @@
+host: Docker Desktop, kernel 6.12.76-linuxkit, aarch64, 10 CPUs
+  one kill in detail (0 MiB):
+    lock 0 (tid 9): reported 0.068 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 1 (tid 10): reported 0.073 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 2 (tid 11): reported 0.056 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 3 (tid 12): reported 0.085 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    pidfd readable 0.154 ms after the kill; runtime threads took 0 more steps after the first report
+supervisor C library: musl (static); worker C library: glibc 2.41; 4 consume threads with a lock each, 2 runtime threads without
+
+All times in ms after the kill; 20 kills per row; median / p90 / max
+worker     first lock reports       last lock reports        pidfd readable           checks
+    0 MiB   0.056/ 0.092/  0.410    0.099/ 0.240/  0.450    0.164/ 0.257/  0.453   consume thread ran after its own report: 0; runtime threads ran after the first report in 0 of 20 kills (up to 0 steps)
+  512 MiB   0.053/ 0.090/  0.166    0.093/ 0.119/  0.186    0.576/ 2.049/  5.743   consume thread ran after its own report: 0; runtime threads ran after the first report in 0 of 20 kills (up to 0 steps)
+ 2048 MiB   0.064/ 0.115/  0.233    0.132/ 0.342/  0.367   25.881/54.227/ 60.098   consume thread ran after its own report: 0; runtime threads ran after the first report in 0 of 20 kills (up to 0 steps)

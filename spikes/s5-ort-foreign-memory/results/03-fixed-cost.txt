@@ -1,0 +1,20 @@
+Laptop VM numbers (Docker Desktop's Linux VM on Apple silicon). Order of magnitude only.
+One thread: intra_op=1, inter_op=1, sequential, spinning off. Each call uses a different request.
+variant bound-once    = RunWithBinding only; the binding was made once
+variant bind-per-call = 2x CreateTensorWithDataAsOrtValue over the request's slot + BindInput + BindOutput + RunWithBinding + release
+variant run-per-call  = 2x CreateTensorWithDataAsOrtValue + Run() with a pre-allocated output + release (no IoBinding)
+tree1.ort is one tree of depth 1: its Run is the runtime's fixed cost with almost no arithmetic.
+
+latency model=tree1.ort rows=1  profile=A  prepack=on  variant=bound-once    calls=100000 warmup=10000 pinned_cpu=2 min_ns=333 p50_ns=417 p90_ns=459 p99_ns=542 p999_ns=5042 max_ns=138042 mean_ns=450 clock_step_ns=41 wall_s=0.1 checksum=-112585
+latency model=tree1.ort rows=1  profile=A  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=541 p50_ns=625 p90_ns=667 p99_ns=834 p999_ns=6417 max_ns=184292 mean_ns=676 clock_step_ns=41 wall_s=0.1 checksum=-112585
+latency model=tree1.ort rows=1  profile=A  prepack=on  variant=run-per-call  calls=100000 warmup=10000 pinned_cpu=2 min_ns=500 p50_ns=583 p90_ns=625 p99_ns=750 p999_ns=4750 max_ns=53250 mean_ns=606 clock_step_ns=41 wall_s=0.1 checksum=-112585
+latency model=tree1.ort rows=1  profile=B  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=542 p50_ns=666 p90_ns=667 p99_ns=792 p999_ns=4333 max_ns=21667 mean_ns=664 clock_step_ns=41 wall_s=0.1 checksum=-112585
+latency model=tree.ort  rows=1  profile=A  prepack=on  variant=bound-once    calls=100000 warmup=10000 pinned_cpu=2 min_ns=7084 p50_ns=9125 p90_ns=9458 p99_ns=13625 p999_ns=22500 max_ns=125167 mean_ns=9259 clock_step_ns=41 wall_s=1.0 checksum=-166561
+latency model=tree.ort  rows=1  profile=A  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=6292 p50_ns=9458 p90_ns=9834 p99_ns=14959 p999_ns=47750 max_ns=278250 mean_ns=9748 clock_step_ns=41 wall_s=1.1 checksum=-166561
+latency model=tree.ort  rows=1  profile=A  prepack=on  variant=run-per-call  calls=100000 warmup=10000 pinned_cpu=2 min_ns=7750 p50_ns=9417 p90_ns=9916 p99_ns=16958 p999_ns=45333 max_ns=1449208 mean_ns=9837 clock_step_ns=41 wall_s=1.1 checksum=-166561
+latency model=tree.ort  rows=1  profile=B  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=7583 p50_ns=9417 p90_ns=9875 p99_ns=16500 p999_ns=54958 max_ns=212417 mean_ns=9753 clock_step_ns=41 wall_s=1.1 checksum=-166561
+latency model=tree.ort  rows=32 profile=A  prepack=on  variant=bind-per-call calls=20000 warmup=2000 pinned_cpu=2 min_ns=211416 p50_ns=227417 p90_ns=237459 p99_ns=268791 p999_ns=388292 max_ns=853459 mean_ns=229496 clock_step_ns=41 wall_s=5.1 checksum=-33026.2
+
+latency model=mlp.ort   rows=1  profile=A  prepack=on  variant=bound-once    calls=100000 warmup=10000 pinned_cpu=2 min_ns=478583 p50_ns=514000 p90_ns=613875 p99_ns=985083 p999_ns=2557167 max_ns=15902625 mean_ns=546505 clock_step_ns=41 wall_s=60.3 checksum=51672.1
+latency model=mlp.ort   rows=1  profile=A  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=478625 p50_ns=517791 p90_ns=659083 p99_ns=1328833 p999_ns=3215917 max_ns=206714083 mean_ns=573566 clock_step_ns=41 wall_s=62.4 checksum=51672.1
+latency model=mlp.ort   rows=1  profile=B  prepack=on  variant=bind-per-call calls=100000 warmup=10000 pinned_cpu=2 min_ns=479583 p50_ns=502208 p90_ns=593417 p99_ns=1050917 p999_ns=2702125 max_ns=35537583 mean_ns=538837 clock_step_ns=41 wall_s=60.4 checksum=51672.1

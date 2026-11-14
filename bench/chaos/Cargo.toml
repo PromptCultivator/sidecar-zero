@@ -1,0 +1,13 @@
+[package]
+name = "scz-kill-agent"
+description = "The node-side kill agent: kills a pod's model process and records CLOCK_MONOTONIC (bench §5)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+libc.workspace = true
+
+[lints]
+workspace = true

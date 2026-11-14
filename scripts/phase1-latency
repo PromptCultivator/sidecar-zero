@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Phase 1 latency: the supervisor, the echo worker, and the Rust client's latency example,
+# all release builds, on one machine.
+#
+#   scripts/phase1-latency [--calls=200000] [--threads=1] [--budget-us=2000]
+#
+# Runs inside the dev container (scripts/dev). Pins the supervisor, the worker, and the
+# client to separate CPUs when there are at least four. Numbers from a VM or a laptop are
+# indicative only; the exit criterion asks for a quiet bare-metal machine (docs/setup/).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+exec scripts/dev bash -c '
+set -euo pipefail
+cargo build -q --release --workspace --examples
+echo "kernel $(uname -r), $(nproc) CPUs, $(grep -m1 -E "model name|^Model|CPU part" /proc/cpuinfo | cut -d: -f2 | xargs || true)"
+sock=/tmp/scz-latency.sock
+pin() { :; }
+if [ "$(nproc)" -ge 4 ] && command -v taskset >/dev/null; then pin() { taskset -pc "$1" "$2" >/dev/null; }; echo "pinned: supervisor cpu 0, worker cpu 1, client cpu 2+"; fi
+target/release/scz-supervisor --socket=$sock --worker=target/release/scz-worker-echo 2>/tmp/scz-sup.log &
+sup=$!
+trap "kill $sup 2>/dev/null || true" EXIT
+for i in $(seq 100); do [ -S $sock ] && break; sleep 0.01; done
+sleep 0.1
+pin 0 $sup
+worker=$(cat /proc/$sup/task/$sup/children | awk "{print \$1}")
+pin 1 "$worker"
+client_cpus="2-$(( $(nproc) - 1 ))"
+if [ "$(nproc)" -ge 4 ] && command -v taskset >/dev/null; then
+  taskset -c "$client_cpus" target/release/examples/latency --socket=$sock "$@"
+else
+  target/release/examples/latency --socket=$sock "$@"
+fi
+' -- "$@"

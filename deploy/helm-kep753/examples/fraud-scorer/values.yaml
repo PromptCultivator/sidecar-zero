@@ -1,0 +1,20 @@
+replicas: 1
+# Must exceed the sidecar's shutdown.sessionGraceSeconds (kubernetes-deploy §1).
+terminationGracePeriodSeconds: 30
+
+# The host application. The demo host calls the sidecar continuously and counts what answered;
+# a real service puts its own image here and its own readiness probe, which must not depend on
+# the model (kubernetes-deploy §6).
+app:
+  image: { repository: scz-demo-host, tag: dev, pullPolicy: IfNotPresent }
+  args: ["--codec=features", "--threads=2", "--budget-us=2000", "--interval-us=500", "--http=0.0.0.0:8080"]
+  port: 8080
+  # Another user than the sidecar's: they share the socket through the pod's fsGroup.
+  runAsUser: 1001
+  resources:
+    requests: { cpu: 200m, memory: 64Mi }
+    limits: { memory: 64Mi }
+
+sidecarzero:
+  image: { repository: sidecarzero-ort, tag: dev }
+  model: { path: /models/fraud.ort }

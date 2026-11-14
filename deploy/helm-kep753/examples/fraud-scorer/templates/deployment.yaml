@@ -1,0 +1,52 @@
+{{- $sz := .Values.sidecarzero -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels: { app: {{ .Release.Name }} }
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels: { app: {{ .Release.Name }} }
+  template:
+    metadata:
+      labels: { app: {{ .Release.Name }} }
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      securityContext:
+        fsGroup: {{ include "sidecarzero.fsGroup" . }}
+      nodeSelector: { kubernetes.io/os: linux }
+      {{- if eq $sz.sidecar.mode "native" }}
+      initContainers:
+        {{- include "sidecarzero.sidecar" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: app
+          image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          args: {{ toJson .Values.app.args }}
+          ports:
+            - { name: http, containerPort: {{ .Values.app.port }} }
+          env:
+            {{- include "sidecarzero.appEnv" . | nindent 12 }}
+          volumeMounts:
+            {{- include "sidecarzero.appVolumeMounts" . | nindent 12 }}
+          # The host can always answer through its fallback: ready whatever the model's state.
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 1
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: {{ .Values.app.runAsUser }}
+            runAsGroup: {{ .Values.app.runAsUser }}
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+        {{- if eq $sz.sidecar.mode "classic" }}
+        {{- include "sidecarzero.sidecar" . | nindent 8 }}
+        {{- end }}
+      volumes:
+        {{- include "sidecarzero.volumes" . | nindent 8 }}

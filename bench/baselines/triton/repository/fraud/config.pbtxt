@@ -1,0 +1,59 @@
+# The fraud model for the benchmark's system B (bench §3), on Triton's ONNX Runtime backend.
+#
+# run.sh copies this file to .repository/fraud/config.pbtxt with the instance count from
+# --instances, and the generated onnx/fraud.onnx to .repository/fraud/1/model.onnx. Triton runs
+# with --disable-auto-complete-config, so this file is the whole configuration: nothing is added
+# by the server or the backend (which would otherwise raise max_batch_size to its default of 4
+# and turn on the dynamic batcher).
+name: "fraud"
+platform: "onnxruntime_onnx"
+
+# No server-side batching. Single-request latency is what the benchmark compares, and without a
+# dynamic batcher Triton has nothing to batch with anyway. The model's own row dimension is
+# declared as it is in the ONNX graph, so a request states its rows in its shape: [1, 256] for
+# the one-row profile, [32, 256] for the 32-row profile, with no batch limit to configure.
+max_batch_size: 0
+input [
+  {
+    name: "features"
+    data_type: TYPE_FP32
+    dims: [ -1, 256 ]
+  }
+]
+output [
+  {
+    name: "score"
+    data_type: TYPE_FP32
+    dims: [ -1, 1 ]
+  }
+]
+
+# One ONNX Runtime session per instance, each run by a single thread: bench §2's rule of the
+# same thread settings as SidecarZero's worker (intra-op 1, inter-op 1, sequential execution).
+# More instances serve more requests at once, as more worker threads do for SidecarZero.
+instance_group [
+  {
+    count: 1 # run.sh --instances
+    kind: KIND_CPU
+  }
+]
+parameters { key: "intra_op_thread_count" value: { string_value: "1" } }
+parameters { key: "inter_op_thread_count" value: { string_value: "1" } }
+parameters { key: "execution_mode" value: { string_value: "0" } }
+
+# One inference at load, so the first request after a start (or a restart) does not pay for the
+# session's first run. SidecarZero's worker warms up the same way before it serves.
+model_warmup [
+  {
+    name: "one_row"
+    batch_size: 1
+    inputs {
+      key: "features"
+      value: {
+        data_type: TYPE_FP32
+        dims: [ 1, 256 ]
+        random_data: true
+      }
+    }
+  }
+]

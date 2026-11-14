@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Translate a PlusCal specification and model-check it with TLC, in a container.
+#
+#   scripts/tlc SPEC [CONFIG] [-- TLC_ARGS...]
+#     scripts/tlc spec/SlotsRing.tla                      uses spec/SlotsRing.cfg
+#     scripts/tlc spec/SlotsRing.tla spec/SlotsRing-live.cfg
+#
+# The PlusCal translation is written back into the .tla file (between the BEGIN and END
+# TRANSLATION markers), so a specification and its translation are always committed together.
+# Needs only Docker. The tools are TLA+ v1.7.4, pinned by checksum.
+#
+# TLC uses one worker thread per core it is given, flat out. By default it gets half the
+# machine's cores, a 4 GB heap, and a 5 GB container limit, at low priority, so the machine
+# stays usable. SCZ_TLC_WORKERS and SCZ_TLC_HEAP_GB raise both for a dedicated machine or CI.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+VERSION=1.7.4
+SHA256=936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+IMAGE=scz-tla:$VERSION
+# The host's own architecture: an emulated JVM runs TLC several times slower.
+PLATFORM=linux/$(docker version -f '{{.Server.Arch}}')
+if [ "$(docker image inspect -f 'linux/{{.Architecture}}' "$IMAGE" 2>/dev/null)" != "$PLATFORM" ]; then
+  docker build --platform "$PLATFORM" -q -t "$IMAGE" - >/dev/null <<DOCKERFILE
+FROM eclipse-temurin:21-jre
+RUN apt-get update -qq && apt-get install -qq -y curl >/dev/null \
+ && curl -fsSL -o /opt/tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v$VERSION/tla2tools.jar \
+ && echo "$SHA256  /opt/tla2tools.jar" | sha256sum -c - \
+ && apt-get purge -qq -y curl >/dev/null && rm -rf /var/lib/apt/lists/*
+DOCKERFILE
+fi
+spec=${1:?usage: scripts/tlc SPEC [CONFIG] [-- TLC_ARGS...]}
+shift
+cfg=${spec%.tla}.cfg
+if [ $# -gt 0 ] && [ "$1" != -- ]; then cfg=$1; shift; fi
+[ "${1:-}" = -- ] && shift
+dir=$(dirname "$spec")
+ncpu=$(docker info --format '{{.NCPU}}')
+workers=${SCZ_TLC_WORKERS:-$(( ncpu > 1 ? ncpu / 2 : 1 ))}
+heap=${SCZ_TLC_HEAP_GB:-4}
+exec docker run --platform "$PLATFORM" --rm -i --cpus "$workers" --memory "$(( heap + 1 ))g" \
+  -v "$PWD/$dir:/spec" -w /spec "$IMAGE" bash -c '
+set -euo pipefail
+spec=$1 cfg=$2; shift 2
+java -cp /opt/tla2tools.jar pcal.trans -nocfg "$spec" >/tmp/pcal.log 2>&1 || { cat /tmp/pcal.log; exit 1; }
+rm -f "${spec%.tla}.old"
+exec nice -n 10 java -XX:+UseParallelGC -Xmx'"$heap"'g '"${SCZ_TLC_JAVA_OPTS:-}"' -cp /opt/tla2tools.jar tlc2.TLC -workers '"$workers"' -cleanup \
+  -metadir /tmp/states -config "$cfg" "$@" "$spec"
+' -- "$(basename "$spec")" "$(basename "$cfg")" "$@"

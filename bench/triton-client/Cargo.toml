@@ -1,0 +1,20 @@
+[package]
+name = "scz-bench-triton"
+description = "Triton's gRPC client with tensors in registered system shared memory (bench §3, system B)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+libc.workspace = true
+prost = "=0.14.6"
+tokio = { version = "=1.54.1", default-features = false, features = ["net", "rt", "time"] }
+tonic = { version = "=0.14.9", default-features = false, features = ["channel", "codegen"] }
+tonic-prost = "=0.14.9"
+
+[build-dependencies]
+tonic-prost-build = { version = "=0.14.9", default-features = false, features = ["transport"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,65 @@
+{
+  "kill": {
+    "ok": true,
+    "result": {
+      "cold_restarts": 0,
+      "container_restarts": {
+        "app": 0,
+        "sidecarzero": 0
+      },
+      "endpoint_changes": 0,
+      "host_after": {
+        "calls": 130494,
+        "fallback": {
+          "DEADLINE": 55,
+          "GATE_DEAD": 7,
+          "NOT_CONNECTED": 2,
+          "STALE_HEARTBEAT": 2,
+          "WORKER_FAILED": 4
+        },
+        "late": 0,
+        "model": 130424,
+        "t_ms": 87109,
+        "wrong": 0
+      },
+      "host_before": {
+        "calls": 5133,
+        "fallback": {
+          "DEADLINE": 2,
+          "NOT_CONNECTED": 2
+        },
+        "late": 0,
+        "model": 5129,
+        "t_ms": 3003,
+        "wrong": 0
+      },
+      "kills": 20,
+      "max_promotion_ms": 0.945,
+      "promotions": 20,
+      "seconds_to_new_consumer": [
+        0.089,
+        0.124,
+        0.086,
+        0.085,
+        0.085,
+        0.083,
+        0.092,
+        0.089,
+        0.094,
+        0.091,
+        0.087,
+        0.128,
+        0.091,
+        0.11,
+        0.087,
+        0.111,
+        0.138,
+        0.09,
+        0.137,
+        0.106
+      ],
+      "slice_events": 1
+    },
+    "seconds": 89.4
+  }
+}

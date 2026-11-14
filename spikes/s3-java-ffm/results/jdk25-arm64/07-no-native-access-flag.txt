@@ -1,0 +1,34 @@
+$ java -Ds3.out=/results/jdk25-arm64 -cp /spike/classes Probe /tmp/scz-s3.sock handshake
+Probe: before any restricted call, Module.isNativeAccessEnabled() = false
+WARNING: A restricted method in java.lang.foreign.Linker has been called
+WARNING: java.lang.foreign.Linker::downcallHandle has been called by S3 in an unnamed module (file:/spike/classes/)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+S3 spike: java.version=25.0.5 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=260
+modes=[handshake]
+[a] socket fd=4 connected to /tmp/scz-s3.sock (SOCK_SEQPACKET|SOCK_CLOEXEC)
+[a] recvmsg returned 24 bytes; magic ok=true ctl_len=65536 data_len=8388608
+[a] msg_controllen=24 msg_flags=0x40000000 (MSG_CTRUNC set=false) cmsg_len=24 level=1 type=1
+[a] SCM_RIGHTS descriptors: control fd=5 data fd=6
+[a] fcntl(F_GETFD): control=0x1 data=0x1 socket=0x1  (FD_CLOEXEC=1 expected on all three)
+[a] lseek(fd,0,SEEK_END): control=65536 (want 65536) data=8388608 (want 8388608)
+[a] fcntl(F_GET_SEALS): control=0x17 (want superset of 0x17: true)  data=0x7 (want superset of 0x7: true)
+[b] mmap(control, PROT_READ, MAP_SHARED)            = 0xffffb8010000
+[b] mmap(control, PROT_READ|PROT_WRITE, MAP_SHARED) = -1 errno=EPERM(1)   (must fail)
+[b] mprotect(control mapping, PROT_READ|PROT_WRITE) = -1 errno=EACCES(13)   (must fail)
+[b] mmap(data, PROT_READ|PROT_WRITE, MAP_SHARED)    = 0xffff76790000
+[b] madvise(control, MADV_POPULATE_READ)=0  madvise(data, MADV_POPULATE_WRITE)=0
+[b] magic read through the segments: control ok=true data ok=true; control header data_len=8388608
+
+[a] --- variadic downcalls (os.arch=aarch64) ---
+[a] fcntl(data, F_DUPFD_CLOEXEC, 100) with firstVariadicArg(2) = 100  (>=100 expected: true)
+[a] fcntl(control, F_ADD_SEALS, F_SEAL_WRITE) = -1 errno=EPERM(1)  (EPERM expected: F_SEAL_SEAL is set)
+[a] syscall(SYS_getpid=172) with firstVariadicArg(1) = 260 ; getpid() = 260 ; equal=true
+[a] syscall(SYS_lseek=62, data, 0, SEEK_END) = 8388608 ; equal to data_len=true
+[a] syscall(SYS_futex=98, addr, FUTEX_WAKE, 1, 0, 0, 0) with no waiters = 0 (0 expected)
+[a] linked WITHOUT firstVariadicArg (for the record): fcntl(F_DUPFD_CLOEXEC,100)=100  syscall(SYS_lseek)=8388608
+[a] nanoTime-to-CLOCK_MONOTONIC offset from calibration: 42 ns
+
+S3 spike: modes [handshake] completed
+[exit status 0]

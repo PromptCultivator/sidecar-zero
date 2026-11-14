@@ -1,0 +1,9 @@
+restarts: 2   last exit: OOMKilled
+--- what the first container instance printed
+supervisor: pid 1 uid 1000, effective capabilities 0000000000000000
+  our cgroup                         /sys/fs/cgroup
+  memory.max                         100663296 
+  memory.oom.group                   1 
+  our oom_score_adj                  988 
+SHIELD oomScoreAdj: writing -1000 FAILED (errno 13)
+  our oom_score_adj now              988 

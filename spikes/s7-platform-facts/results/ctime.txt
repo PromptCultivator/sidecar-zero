@@ -1,0 +1,25 @@
+directory  operation                                    what the open descriptor then reports
+/tmp       unlink while open                            ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/tmp       another file renamed over it                 ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/tmp       file renamed to a new name                   ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/tmp       symlink swapped to a new directory           ctime same      mtime same      size same      inode same  nlink 1->1
+/tmp       then the old directory removed               ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/tmp       control: chmod                               ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/tmp       control: bytes overwritten in place          ctime CHANGED   mtime CHANGED   size same      inode same  nlink 1->1
+
+/mnt/tmpfs unlink while open                            ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/tmpfs another file renamed over it                 ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/tmpfs file renamed to a new name                   ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/mnt/tmpfs symlink swapped to a new directory           ctime same      mtime same      size same      inode same  nlink 1->1
+/mnt/tmpfs then the old directory removed               ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/tmpfs control: chmod                               ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/mnt/tmpfs control: bytes overwritten in place          ctime CHANGED   mtime CHANGED   size same      inode same  nlink 1->1
+
+/mnt/volume unlink while open                            ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/volume another file renamed over it                 ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/volume file renamed to a new name                   ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/mnt/volume symlink swapped to a new directory           ctime same      mtime same      size same      inode same  nlink 1->1
+/mnt/volume then the old directory removed               ctime CHANGED   mtime same      size same      inode same  nlink 1->0
+/mnt/volume control: chmod                               ctime CHANGED   mtime same      size same      inode same  nlink 1->1
+/mnt/volume control: bytes overwritten in place          ctime CHANGED   mtime CHANGED   size same      inode same  nlink 1->1
+

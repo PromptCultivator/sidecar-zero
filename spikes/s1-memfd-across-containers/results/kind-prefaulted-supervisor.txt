@@ -1,0 +1,8 @@
+supervisor: uid 1000 gid 1000, data segment 64 MiB, prefault=1
+supervisor at start                                   current    1.41 MiB   shmem    0.00 MiB   anon   0.06 MiB   pagetables  0.04 MiB
+supervisor after creating and pre-faulting            current   65.26 MiB   shmem   64.00 MiB   anon   0.06 MiB   pagetables  0.16 MiB
+supervisor: listening on /run/scz/scz.sock
+supervisor: client connected, SO_PEERCRED uid 1001 gid 1001 pid 0
+supervisor after the client wrote every page          current   64.82 MiB   shmem   64.00 MiB   anon   0.06 MiB   pagetables  0.16 MiB
+supervisor: stored the word and woke 1 sleeper(s)
+supervisor at the end                                 current   64.82 MiB   shmem   64.00 MiB   anon   0.06 MiB   pagetables  0.16 MiB

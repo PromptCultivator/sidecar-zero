@@ -1,0 +1,158 @@
+178
+2026-11-12T11:55:49.214224709Z
+22.0.2+9
+
+#1 "main"
+      java.base/java.lang.Thread.getStackTrace(Thread.java:2418)
+      java.base/jdk.internal.vm.ThreadDumper.dumpThread(ThreadDumper.java:165)
+      java.base/jdk.internal.vm.ThreadDumper.lambda$dumpThreads$0(ThreadDumper.java:158)
+      java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:194)
+      java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:1024)
+      java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:556)
+      java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+      java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+      java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+      java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:782)
+      java.base/jdk.internal.vm.ThreadDumper.dumpThreads(ThreadDumper.java:158)
+      java.base/jdk.internal.vm.ThreadDumper.dumpThreads(ThreadDumper.java:154)
+      java.base/jdk.internal.vm.ThreadDumper.dumpThreads(ThreadDumper.java:140)
+      jdk.management/com.sun.management.internal.HotSpotDiagnostic.dumpThreads(HotSpotDiagnostic.java:196)
+      jdk.management/com.sun.management.internal.HotSpotDiagnostic.lambda$dumpThreads$1(HotSpotDiagnostic.java:178)
+      java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+      jdk.management/com.sun.management.internal.HotSpotDiagnostic.dumpThreads(HotSpotDiagnostic.java:182)
+      S3.pinScenario(S3.java:871)
+      S3.pinTests(S3.java:938)
+      S3.main(S3.java:1073)
+
+#9 "Reference Handler"
+      java.base/java.lang.ref.Reference.waitForReferencePendingList(Native Method)
+      java.base/java.lang.ref.Reference.processPendingReferences(Reference.java:246)
+      java.base/java.lang.ref.Reference$ReferenceHandler.run(Reference.java:208)
+
+#10 "Finalizer"
+      java.base/java.lang.Object.wait0(Native Method)
+      java.base/java.lang.Object.wait(Object.java:375)
+      java.base/java.lang.Object.wait(Object.java:348)
+      java.base/java.lang.ref.NativeReferenceQueue.await(NativeReferenceQueue.java:48)
+      java.base/java.lang.ref.ReferenceQueue.remove0(ReferenceQueue.java:158)
+      java.base/java.lang.ref.NativeReferenceQueue.remove(NativeReferenceQueue.java:89)
+      java.base/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:173)
+
+#11 "Signal Dispatcher"
+
+#17 "Notification Thread"
+
+#18 "Common-Cleaner"
+      java.base/jdk.internal.misc.Unsafe.park(Native Method)
+      java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+      java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1847)
+      java.base/java.lang.ref.ReferenceQueue.await(ReferenceQueue.java:71)
+      java.base/java.lang.ref.ReferenceQueue.remove0(ReferenceQueue.java:143)
+      java.base/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:218)
+      java.base/jdk.internal.ref.CleanerImpl.run(CleanerImpl.java:140)
+      java.base/java.lang.Thread.run(Thread.java:1570)
+      java.base/jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:186)
+
+#19 "JFR Recorder Thread"
+
+#23 "JFR Periodic Tasks"
+      java.base/java.lang.Object.wait0(Native Method)
+      java.base/java.lang.Object.wait(Object.java:375)
+      jdk.jfr/jdk.jfr.internal.PlatformRecorder.takeNap(PlatformRecorder.java:558)
+      jdk.jfr/jdk.jfr.internal.PlatformRecorder.periodicTask(PlatformRecorder.java:526)
+      jdk.jfr/jdk.jfr.internal.PlatformRecorder.lambda$startDiskMonitor$1(PlatformRecorder.java:446)
+      java.base/java.lang.Thread.run(Thread.java:1570)
+
+#34 "parker-0" virtual
+      S3.futexWait(S3.java:199)
+      S3.lambda$pinScenario$11(S3.java:834)
+      java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+#35 "parker-1" virtual
+      S3.futexWait(S3.java:199)
+      S3.lambda$pinScenario$11(S3.java:834)
+      java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+#36 "parker-2" virtual
+      S3.futexWait(S3.java:199)
+      S3.lambda$pinScenario$11(S3.java:834)
+      java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+#37 "parker-3" virtual
+      S3.futexWait(S3.java:199)
+      S3.lambda$pinScenario$11(S3.java:834)
+      java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+#38 "late" virtual
+
+#25 "ticker" virtual
+      java.base/java.lang.VirtualThread.parkNanos(VirtualThread.java:635)
+      java.base/java.lang.VirtualThread.sleepNanos(VirtualThread.java:812)
+      java.base/java.lang.Thread.sleepNanos(Thread.java:489)
+      java.base/java.lang.Thread.sleep(Thread.java:522)
+      S3.lambda$pinTests$13(S3.java:931)
+      java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+#27 "VirtualThread-unparker"
+      java.base/jdk.internal.misc.Unsafe.park(Native Method)
+      java.base/java.util.concurrent.locks.LockSupport.park(LockSupport.java:371)
+      java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(AbstractQueuedSynchronizer.java:519)
+      java.base/java.util.concurrent.ForkJoinPool.unmanagedBlock(ForkJoinPool.java:4011)
+      java.base/java.util.concurrent.ForkJoinPool.managedBlock(ForkJoinPool.java:3959)
+      java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1707)
+      java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1170)
+      java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+      java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1070)
+      java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+      java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+      java.base/java.lang.Thread.run(Thread.java:1570)
+      java.base/jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:186)
+
+#26 "ForkJoinPool-1-worker-1"
+      java.base/jdk.internal.vm.Continuation.run(Continuation.java:248)
+      java.base/java.lang.VirtualThread.runContinuation(VirtualThread.java:245)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1726)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1717)
+      java.base/java.util.concurrent.ForkJoinTask$InterruptibleTask.exec(ForkJoinTask.java:1641)
+      java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:507)
+      java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1489)
+      java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:2071)
+      java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2033)
+      java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
+
+#31 "ForkJoinPool-1-worker-2"
+      java.base/jdk.internal.vm.Continuation.run(Continuation.java:248)
+      java.base/java.lang.VirtualThread.runContinuation(VirtualThread.java:245)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1726)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1717)
+      java.base/java.util.concurrent.ForkJoinTask$InterruptibleTask.exec(ForkJoinTask.java:1641)
+      java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:507)
+      java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1489)
+      java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:2071)
+      java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2033)
+      java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
+
+#32 "ForkJoinPool-1-worker-3"
+      java.base/jdk.internal.vm.Continuation.run(Continuation.java:248)
+      java.base/java.lang.VirtualThread.runContinuation(VirtualThread.java:245)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1726)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1717)
+      java.base/java.util.concurrent.ForkJoinTask$InterruptibleTask.exec(ForkJoinTask.java:1641)
+      java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:507)
+      java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1489)
+      java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:2071)
+      java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2033)
+      java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
+
+#33 "ForkJoinPool-1-worker-4"
+      java.base/jdk.internal.vm.Continuation.run(Continuation.java:248)
+      java.base/java.lang.VirtualThread.runContinuation(VirtualThread.java:245)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1726)
+      java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1717)
+      java.base/java.util.concurrent.ForkJoinTask$InterruptibleTask.exec(ForkJoinTask.java:1641)
+      java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:507)
+      java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1489)
+      java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:2071)
+      java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2033)
+      java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# The chaos benchmark (bench §6): run bench/run.py in the dev image with the Docker socket.
+# Usually reached through bench/Makefile; arguments go to bench/run.py:
+#
+#   scripts/bench --quick                         laptop scale: every system, both modes
+#   scripts/bench --modes=inproc --systems=A,E    one mode, some systems
+#
+# Results and the report land in bench/results/<timestamp>/.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+SCZ_DOCKER=1 exec scripts/dev python3 -u bench/run.py "$@"

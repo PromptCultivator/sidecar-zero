@@ -1,0 +1,13 @@
+$ java --illegal-native-access=deny -Ds3.out=/results/jdk25-arm64 -cp /spike/classes Probe /tmp/scz-s3.sock handshake
+Probe: before any restricted call, Module.isNativeAccessEnabled() = false
+Exception in thread "main" java.lang.ExceptionInInitializerError
+	at Probe.main(S3.java:1090)
+Caused by: java.lang.IllegalCallerException: Illegal native access from an unnamed module (file:/spike/classes/)
+	at java.base/java.lang.Module.ensureNativeAccess(Module.java:307)
+	at java.base/java.lang.System$1.ensureNativeAccess(System.java:2107)
+	at java.base/jdk.internal.reflect.Reflection.ensureNativeAccess(Reflection.java:123)
+	at java.base/jdk.internal.foreign.abi.AbstractLinker.downcallHandle(AbstractLinker.java:95)
+	at S3.dc(S3.java:77)
+	at S3.<clinit>(S3.java:81)
+	... 1 more
+[exit status 1]

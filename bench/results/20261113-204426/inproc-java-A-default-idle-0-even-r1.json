@@ -1,0 +1,1 @@
+{"host": "java", "mode": "inproc", "system": "A", "variant": "default", "scenario": "idle", "duration_s": 10, "sidecar_cpu_ratio": 0.023993747817165668}

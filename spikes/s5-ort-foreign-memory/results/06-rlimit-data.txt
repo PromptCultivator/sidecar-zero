@@ -1,0 +1,19 @@
+== rlimit model=/work/models/mlp.ort profile=A allocator=glibc malloc
+  warm-up 1 row: ran; 32 rows: ran
+  VmData now 53692 kB; setrlimit(RLIMIT_DATA, VmData + 32 MB) -> ok
+  4096 rows (needs about 96 MB of activations for the MLP): REFUSED with OrtErrorCode 6: Non-zero status code returned while running FusedGemm node. Name:'fused gemm0' Status Message: std::bad_alloc
+  1 row afterwards: ran
+  32 rows afterwards: ran
+  process still alive, RssAnon=46524 kB
+
+exit code: 0
+
+== rlimit model=/work/models/mlp.ort profile=A allocator=jemalloc (LD_PRELOAD)
+  warm-up 1 row: ran; 32 rows: ran
+  VmData now 83772 kB; setrlimit(RLIMIT_DATA, VmData + 32 MB) -> ok
+  4096 rows (needs about 96 MB of activations for the MLP): REFUSED with OrtErrorCode 6: Non-zero status code returned while running FusedGemm node. Name:'fused gemm0' Status Message: std::bad_alloc
+  1 row afterwards: ran
+  32 rows afterwards: ran
+  process still alive, RssAnon=58244 kB
+
+exit code: 0

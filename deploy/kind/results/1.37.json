@@ -1,0 +1,362 @@
+{
+  "abi": {
+    "ok": true,
+    "result": {
+      "host": {
+        "calls": 1833,
+        "fallback": {
+          "DEADLINE": 50,
+          "NOT_CONNECTED": 6,
+          "OVERLOADED": 15,
+          "STALE_HEARTBEAT": 32
+        },
+        "late": 0,
+        "model": 1730,
+        "t_ms": 2007,
+        "wrong": 0
+      }
+    },
+    "seconds": 929.8
+  },
+  "admin": {
+    "ok": true,
+    "result": {
+      "dump_ok": true,
+      "state": "HEALTHY"
+    },
+    "seconds": 4810.3
+  },
+  "degraded": {
+    "ok": true,
+    "result": {
+      "modelz": "{\"state\":\"INIT\",\"reason\":\"NO_MODEL\",\"gen\":0,\"model\":{\"sha256\":null,\"registry_epoch\":0,\"schema_fingerprint\":\"0x0000000000000000\",\"previous_sha256\":null,\"rollbacks\":0,\"rejected\":0},\"holds\":[\"init\"],\"wor",
+      "ready_during_bad_update": 2,
+      "stuck_new_pods": 1
+    },
+    "seconds": 1479.7
+  },
+  "delete": {
+    "ok": true,
+    "result": {
+      "seconds": 0.9
+    },
+    "seconds": 4.8
+  },
+  "frozen": {
+    "ok": true,
+    "result": {
+      "restarts": {
+        "app": 0,
+        "sidecarzero": 1
+      }
+    },
+    "seconds": 48.1
+  },
+  "host-killed": {
+    "ok": true,
+    "result": {
+      "host": {
+        "calls": 3756,
+        "fallback": {
+          "NOT_CONNECTED": 2
+        },
+        "late": 0,
+        "model": 3754,
+        "t_ms": 2002,
+        "wrong": 0
+      },
+      "resets": 1
+    },
+    "seconds": 6.6
+  },
+  "kill": {
+    "ok": true,
+    "result": {
+      "cold_restarts": 0,
+      "container_restarts": {
+        "app": 0,
+        "sidecarzero": 0
+      },
+      "endpoint_changes": 0,
+      "host_after": {
+        "calls": 158906,
+        "fallback": {
+          "DEADLINE": 81,
+          "GATE_DEAD": 15,
+          "NOT_CONNECTED": 3,
+          "STALE_HEARTBEAT": 7,
+          "WORKER_FAILED": 5
+        },
+        "late": 0,
+        "model": 158795,
+        "t_ms": 87097,
+        "wrong": 0
+      },
+      "host_before": {
+        "calls": 3649,
+        "fallback": {
+          "DEADLINE": 1,
+          "NOT_CONNECTED": 3
+        },
+        "late": 0,
+        "model": 3645,
+        "t_ms": 2002,
+        "wrong": 0
+      },
+      "kills": 20,
+      "max_promotion_ms": 3.024,
+      "promotions": 20,
+      "seconds_to_new_consumer": [
+        0.106,
+        0.092,
+        0.125,
+        0.103,
+        0.099,
+        0.1,
+        0.102,
+        0.096,
+        0.115,
+        0.33,
+        0.149,
+        0.099,
+        0.127,
+        0.099,
+        0.108,
+        0.119,
+        0.101,
+        0.123,
+        0.092,
+        0.142
+      ],
+      "slice_events": 1
+    },
+    "seconds": 91.0
+  },
+  "leak": {
+    "ok": true,
+    "result": {
+      "calls_during": 44763,
+      "fallbacks_during": {
+        "DEADLINE": 17,
+        "GATE_DEAD": 1,
+        "NOT_CONNECTED": 0,
+        "STALE_HEARTBEAT": 7,
+        "WORKER_FAILED": 1
+      },
+      "kernel_oom": [
+        "scz_kernel_oom_events_total{kind=\"oom_kill\"} 0",
+        "scz_kernel_oom_events_total{kind=\"oom_group_kill\"} 0"
+      ],
+      "restarts": {
+        "app": 0,
+        "sidecarzero": 0
+      },
+      "status": {
+        "deaths": 1,
+        "gen": 2,
+        "last_cause": "heartbeat stale",
+        "promotions": 1,
+        "reloads": 0,
+        "spawns": 3
+      }
+    },
+    "seconds": 28.1
+  },
+  "oom": {
+    "ok": true,
+    "result": {
+      "nestedCgroup": {
+        "endpoint_changes": 0,
+        "kernel_oom": [
+          "scz_kernel_oom_events_total{kind=\"oom_kill\"} 1",
+          "scz_kernel_oom_events_total{kind=\"oom_group_kill\"} 0"
+        ],
+        "last_state": null,
+        "mode_in_effect": "nestedCgroup",
+        "pid1_survived": true,
+        "sidecar_restarts": 0,
+        "standby_survived": true,
+        "status": {
+          "deaths": 1,
+          "gen": 2,
+          "last_cause": "",
+          "promotions": 1,
+          "restarts": 0,
+          "spawns": 3
+        }
+      },
+      "none": {
+        "endpoint_changes": 3,
+        "kernel_oom": [],
+        "last_state": "OOMKilled",
+        "mode_in_effect": "?",
+        "pid1_survived": false,
+        "sidecar_restarts": 1,
+        "standby_survived": false,
+        "status": null
+      },
+      "none+monitor": {
+        "endpoint_changes": 0,
+        "kernel_oom": [
+          "scz_kernel_oom_events_total{kind=\"oom_kill\"} 0",
+          "scz_kernel_oom_events_total{kind=\"oom_group_kill\"} 0"
+        ],
+        "last_state": null,
+        "mode_in_effect": "none",
+        "pid1_survived": true,
+        "sidecar_restarts": 0,
+        "standby_survived": true,
+        "status": {
+          "deaths": 0,
+          "gen": 2,
+          "last_cause": "",
+          "promotions": 0,
+          "restarts": 0,
+          "spawns": 3
+        }
+      },
+      "oomScoreAdj": {
+        "endpoint_changes": 0,
+        "kernel_oom": [
+          "scz_kernel_oom_events_total{kind=\"oom_kill\"} 3",
+          "scz_kernel_oom_events_total{kind=\"oom_group_kill\"} 1"
+        ],
+        "last_state": null,
+        "mode_in_effect": "oomScoreAdj",
+        "pid1_survived": true,
+        "sidecar_restarts": 0,
+        "standby_survived": false,
+        "status": {
+          "deaths": 2,
+          "gen": 4,
+          "last_cause": "",
+          "promotions": 1,
+          "restarts": 1,
+          "spawns": 5
+        }
+      }
+    },
+    "seconds": 74.4
+  },
+  "oom-singleProcess": {
+    "ok": true,
+    "result": {
+      "singleProcess": {
+        "endpoint_changes": 0,
+        "kernel_oom": [
+          "scz_kernel_oom_events_total{kind=\"oom_kill\"} 0",
+          "scz_kernel_oom_events_total{kind=\"oom_group_kill\"} 0"
+        ],
+        "last_state": null,
+        "mode_in_effect": "singleProcess",
+        "pid1_survived": true,
+        "sidecar_restarts": 0,
+        "standby_survived": true,
+        "status": {
+          "deaths": 1,
+          "gen": 2,
+          "last_cause": "heartbeat stale",
+          "promotions": 1,
+          "restarts": 0,
+          "spawns": 3
+        }
+      }
+    },
+    "seconds": 18.4
+  },
+  "reload": {
+    "ok": true,
+    "result": {
+      "ambient_before": {
+        "DEADLINE": 4,
+        "STALE_HEARTBEAT": 4
+      },
+      "ambient_calls": 91142,
+      "calls_around": 6336,
+      "fallbacks_around": {},
+      "reloads": 1
+    },
+    "seconds": 69.1
+  },
+  "restricted": {
+    "ok": true,
+    "result": {
+      "admitted": true
+    },
+    "seconds": 3.9
+  },
+  "rollback": {
+    "ok": true,
+    "result": {
+      "deaths": 3,
+      "rollbacks": 1
+    },
+    "seconds": 78.5
+  },
+  "second-client": {
+    "ok": true,
+    "result": {
+      "second": {
+        "calls": 20,
+        "fallback": {
+          "NOT_CONNECTED": 20
+        },
+        "late": 0,
+        "model": 0,
+        "t_ms": 1003,
+        "wrong": 0
+      }
+    },
+    "seconds": 9.3
+  },
+  "start": {
+    "ok": true,
+    "result": {
+      "host": {
+        "calls": 3657,
+        "fallback": {
+          "NOT_CONNECTED": 2
+        },
+        "late": 0,
+        "model": 3655,
+        "t_ms": 2001,
+        "wrong": 0
+      },
+      "host_started": "2026-11-14T05:02:05Z",
+      "sidecar_started": "2026-11-14T05:02:04Z"
+    },
+    "seconds": 4.4
+  },
+  "supervisor-killed": {
+    "ok": true,
+    "result": {
+      "host": {
+        "calls": 9159,
+        "fallback": {
+          "DEADLINE": 3,
+          "GATE_INIT": 4,
+          "NOT_CONNECTED": 995,
+          "REBINDING": 8
+        },
+        "late": 0,
+        "model": 8149,
+        "t_ms": 5006,
+        "wrong": 0
+      },
+      "restarts": {
+        "app": 0,
+        "sidecarzero": 1
+      }
+    },
+    "seconds": 7.2
+  },
+  "users": {
+    "ok": true,
+    "result": {
+      "fsGroup": 65532,
+      "host_uid": 1001,
+      "sidecar_uid": 65532
+    },
+    "seconds": 4.2
+  }
+}

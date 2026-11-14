@@ -1,0 +1,164 @@
+All values in kB. 'model-file mapping' sums the /proc/self/smaps entries backed by the model file.
+Session options otherwise as profile A. Variants:
+  bytes+init = mmap read-only, CreateSessionFromArray, session.use_ort_model_bytes_directly=1 and
+               session.use_ort_model_bytes_for_initializers=1 (what the design names)
+  bytes      = the same with only session.use_ort_model_bytes_directly=1
+  buffer     = mmap read-only, CreateSessionFromArray, neither option
+  path       = CreateSession by file name, neither option
+  path-mmap  = CreateSession by file name, session.use_memory_mapped_ort_model=1 and
+               session.use_ort_model_bytes_for_initializers=1
+
+######## one process
+== load model=/work/models/mlp.ort variant=bytes+init prepacking on (default)
+session created in 27.3 ms (VM timing); RssAnon before load=7328 kB
+REPORT pid=178 after-load   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=178 after-load   whole process:      Rss=102544 Pss=101886 Pss_Anon=45696 Pss_File=56190 kB (smaps_rollup) | RssAnon=45696 RssFile=56848 kB (status)
+REPORT pid=178 after-warmup model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=178 after-warmup whole process:      Rss=102864 Pss=102206 Pss_Anon=45760 Pss_File=56446 kB (smaps_rollup) | RssAnon=45760 RssFile=57104 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=178 after-drop   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=178 after-drop   whole process:      Rss=65964 Pss=65306 Pss_Anon=45760 Pss_File=19546 kB (smaps_rollup) | RssAnon=45760 RssFile=20204 kB (status)
+REPORT pid=178 after-rerun  model-file mapping: vmas=1 perms=r--s Size=36900 Rss=128 Pss=128 Shared_Clean=0 Shared_Dirty=0 Private_Clean=128 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=178 after-rerun  whole process:      Rss=66908 Pss=66250 Pss_Anon=46576 Pss_File=19674 kB (smaps_rollup) | RssAnon=46576 RssFile=20332 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.ort variant=bytes prepacking on (default)
+session created in 20.6 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=180 after-load   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=180 after-load   whole process:      Rss=102584 Pss=101926 Pss_Anon=45736 Pss_File=56190 kB (smaps_rollup) | RssAnon=45736 RssFile=56848 kB (status)
+REPORT pid=180 after-warmup model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=180 after-warmup whole process:      Rss=102900 Pss=102242 Pss_Anon=45796 Pss_File=56446 kB (smaps_rollup) | RssAnon=45796 RssFile=57104 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=180 after-drop   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=180 after-drop   whole process:      Rss=66000 Pss=65342 Pss_Anon=45796 Pss_File=19546 kB (smaps_rollup) | RssAnon=45796 RssFile=20204 kB (status)
+REPORT pid=180 after-rerun  model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=180 after-rerun  whole process:      Rss=66792 Pss=66134 Pss_Anon=46588 Pss_File=19546 kB (smaps_rollup) | RssAnon=46588 RssFile=20204 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.ort variant=buffer prepacking on (default)
+session created in 24.3 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=182 after-load   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=182 after-load   whole process:      Rss=102592 Pss=101934 Pss_Anon=45744 Pss_File=56190 kB (smaps_rollup) | RssAnon=45744 RssFile=56848 kB (status)
+REPORT pid=182 after-warmup model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=182 after-warmup whole process:      Rss=102900 Pss=102242 Pss_Anon=45796 Pss_File=56446 kB (smaps_rollup) | RssAnon=45796 RssFile=57104 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=182 after-drop   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=182 after-drop   whole process:      Rss=66000 Pss=65342 Pss_Anon=45796 Pss_File=19546 kB (smaps_rollup) | RssAnon=45796 RssFile=20204 kB (status)
+REPORT pid=182 after-rerun  model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=182 after-rerun  whole process:      Rss=66792 Pss=66134 Pss_Anon=46588 Pss_File=19546 kB (smaps_rollup) | RssAnon=46588 RssFile=20204 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.ort variant=path prepacking on (default)
+session created in 22.5 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=184 after-load   model-file mapping: vmas=0 perms=- Size=0 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=184 after-load   whole process:      Rss=65684 Pss=65026 Pss_Anon=45736 Pss_File=19290 kB (smaps_rollup) | RssAnon=45736 RssFile=19948 kB (status)
+REPORT pid=184 after-warmup model-file mapping: vmas=0 perms=- Size=0 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=184 after-warmup whole process:      Rss=65992 Pss=65334 Pss_Anon=45788 Pss_File=19546 kB (smaps_rollup) | RssAnon=45788 RssFile=20204 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.ort variant=path-mmap prepacking on (default)
+session created in 20.5 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=186 after-load   model-file mapping: vmas=1 perms=rw-p Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=186 after-load   whole process:      Rss=102548 Pss=101890 Pss_Anon=45700 Pss_File=56190 kB (smaps_rollup) | RssAnon=45700 RssFile=56848 kB (status)
+REPORT pid=186 after-warmup model-file mapping: vmas=1 perms=rw-p Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=186 after-warmup whole process:      Rss=102840 Pss=102182 Pss_Anon=45736 Pss_File=56446 kB (smaps_rollup) | RssAnon=45736 RssFile=57104 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.onnx variant=buffer prepacking on (default)
+session created in 26.6 ms (VM timing); RssAnon before load=7328 kB
+REPORT pid=188 after-load   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=188 after-load   whole process:      Rss=102704 Pss=102048 Pss_Anon=45732 Pss_File=56316 kB (smaps_rollup) | RssAnon=45732 RssFile=56972 kB (status)
+REPORT pid=188 after-warmup model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=188 after-warmup whole process:      Rss=102972 Pss=102316 Pss_Anon=45808 Pss_File=56508 kB (smaps_rollup) | RssAnon=45808 RssFile=57164 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=188 after-drop   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=188 after-drop   whole process:      Rss=66072 Pss=65416 Pss_Anon=45808 Pss_File=19608 kB (smaps_rollup) | RssAnon=45808 RssFile=20264 kB (status)
+REPORT pid=188 after-rerun  model-file mapping: vmas=1 perms=r--s Size=36900 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=188 after-rerun  whole process:      Rss=66864 Pss=66208 Pss_Anon=46600 Pss_File=19608 kB (smaps_rollup) | RssAnon=46600 RssFile=20264 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/mlp.onnx variant=path prepacking on (default)
+session created in 20.5 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=190 after-load   model-file mapping: vmas=0 perms=- Size=0 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=190 after-load   whole process:      Rss=69780 Pss=69122 Pss_Anon=49704 Pss_File=19418 kB (smaps_rollup) | RssAnon=49704 RssFile=20076 kB (status)
+REPORT pid=190 after-warmup model-file mapping: vmas=0 perms=- Size=0 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=190 after-warmup whole process:      Rss=66068 Pss=65410 Pss_Anon=45800 Pss_File=19610 kB (smaps_rollup) | RssAnon=45800 RssFile=20268 kB (status)
+score[0]=0.5726882
+
+== load model=/work/models/tree.ort variant=bytes+init prepacking on (default)
+session created in 7.4 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=192 after-load   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=3132 Shared_Clean=0 Shared_Dirty=0 Private_Clean=3132 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=192 after-load   whole process:      Rss=42256 Pss=41598 Pss_Anon=18792 Pss_File=22806 kB (smaps_rollup) | RssAnon=18792 RssFile=23464 kB (status)
+REPORT pid=192 after-warmup model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=3132 Shared_Clean=0 Shared_Dirty=0 Private_Clean=3132 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=192 after-warmup whole process:      Rss=33604 Pss=32946 Pss_Anon=10012 Pss_File=22934 kB (smaps_rollup) | RssAnon=10012 RssFile=23592 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=192 after-drop   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=192 after-drop   whole process:      Rss=30472 Pss=29814 Pss_Anon=10012 Pss_File=19802 kB (smaps_rollup) | RssAnon=10012 RssFile=20460 kB (status)
+REPORT pid=192 after-rerun  model-file mapping: vmas=1 perms=r--s Size=3132 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=192 after-rerun  whole process:      Rss=30472 Pss=29814 Pss_Anon=10012 Pss_File=19802 kB (smaps_rollup) | RssAnon=10012 RssFile=20460 kB (status)
+score[0]=-1.645169
+
+== load model=/work/models/tree.ort variant=buffer prepacking on (default)
+session created in 7.5 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=194 after-load   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=3132 Shared_Clean=0 Shared_Dirty=0 Private_Clean=3132 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=194 after-load   whole process:      Rss=42252 Pss=41596 Pss_Anon=18792 Pss_File=22804 kB (smaps_rollup) | RssAnon=18792 RssFile=23460 kB (status)
+REPORT pid=194 after-warmup model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=3132 Shared_Clean=0 Shared_Dirty=0 Private_Clean=3132 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=194 after-warmup whole process:      Rss=33604 Pss=32948 Pss_Anon=10016 Pss_File=22932 kB (smaps_rollup) | RssAnon=10016 RssFile=23588 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=194 after-drop   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=194 after-drop   whole process:      Rss=30472 Pss=29816 Pss_Anon=10016 Pss_File=19800 kB (smaps_rollup) | RssAnon=10016 RssFile=20456 kB (status)
+REPORT pid=194 after-rerun  model-file mapping: vmas=1 perms=r--s Size=3132 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=194 after-rerun  whole process:      Rss=30472 Pss=29816 Pss_Anon=10016 Pss_File=19800 kB (smaps_rollup) | RssAnon=10016 RssFile=20456 kB (status)
+score[0]=-1.645169
+
+== load model=/work/models/tree.onnx variant=buffer prepacking on (default)
+session created in 10.2 ms (VM timing); RssAnon before load=7332 kB
+REPORT pid=196 after-load   model-file mapping: vmas=1 perms=r--s Size=1216 Rss=1216 Pss=1216 Shared_Clean=0 Shared_Dirty=0 Private_Clean=1216 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=196 after-load   whole process:      Rss=45712 Pss=45054 Pss_Anon=24036 Pss_File=21018 kB (smaps_rollup) | RssAnon=24036 RssFile=21676 kB (status)
+REPORT pid=196 after-warmup model-file mapping: vmas=1 perms=r--s Size=1216 Rss=1216 Pss=1216 Shared_Clean=0 Shared_Dirty=0 Private_Clean=1216 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=196 after-warmup whole process:      Rss=36460 Pss=35802 Pss_Anon=14656 Pss_File=21146 kB (smaps_rollup) | RssAnon=14656 RssFile=21804 kB (status)
+madvise(model mapping, MADV_DONTNEED) -> ok
+REPORT pid=196 after-drop   model-file mapping: vmas=1 perms=r--s Size=1216 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=196 after-drop   whole process:      Rss=35244 Pss=34586 Pss_Anon=14656 Pss_File=19930 kB (smaps_rollup) | RssAnon=14656 RssFile=20588 kB (status)
+REPORT pid=196 after-rerun  model-file mapping: vmas=1 perms=r--s Size=1216 Rss=0 Pss=0 Shared_Clean=0 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+REPORT pid=196 after-rerun  whole process:      Rss=35244 Pss=34586 Pss_Anon=14656 Pss_File=19930 kB (smaps_rollup) | RssAnon=14656 RssFile=20588 kB (status)
+score[0]=-1.645169
+
+
+######## two processes alive at once
+== share model=/work/models/mlp.ort variant=bytes+init
+   REPORT pid=199 P1-alone     model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=199 P1-alone     whole process:      Rss=102844 Pss=101882 Pss_Anon=45740 Pss_File=56142 kB (smaps_rollup) | RssAnon=45740 RssFile=57104 kB (status)
+   REPORT pid=199 P1-with-P2   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=199 P1-with-P2   whole process:      Rss=102844 Pss=73936 Pss_Anon=45740 Pss_File=28196 kB (smaps_rollup) | RssAnon=45740 RssFile=57104 kB (status)
+   REPORT pid=201 P2-with-P1   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=201 P2-with-P1   whole process:      Rss=102848 Pss=73940 Pss_Anon=45744 Pss_File=28196 kB (smaps_rollup) | RssAnon=45744 RssFile=57104 kB (status)
+SUMMARY mlp.ort bytes+init: model-file mapping Pss 36900 kB alone -> 18450 kB with a second process; whole-process Pss 101882 -> 73936 kB; Pss_Anon 45740 -> 45740 kB; both processes together 147876 kB Pss (one alone: 101882 kB)
+
+== share model=/work/models/mlp.onnx variant=buffer
+   REPORT pid=204 P1-alone     model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=204 P1-alone     whole process:      Rss=102952 Pss=101998 Pss_Anon=45796 Pss_File=56202 kB (smaps_rollup) | RssAnon=45796 RssFile=57156 kB (status)
+   REPORT pid=204 P1-with-P2   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=204 P1-with-P2   whole process:      Rss=102952 Pss=74021 Pss_Anon=45796 Pss_File=28225 kB (smaps_rollup) | RssAnon=45796 RssFile=57156 kB (status)
+   REPORT pid=206 P2-with-P1   model-file mapping: vmas=1 perms=r--s Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=206 P2-with-P1   whole process:      Rss=102960 Pss=74024 Pss_Anon=45796 Pss_File=28228 kB (smaps_rollup) | RssAnon=45796 RssFile=57164 kB (status)
+SUMMARY mlp.onnx buffer: model-file mapping Pss 36900 kB alone -> 18450 kB with a second process; whole-process Pss 101998 -> 74021 kB; Pss_Anon 45796 -> 45796 kB; both processes together 148045 kB Pss (one alone: 101998 kB)
+
+== share model=/work/models/mlp.ort variant=path-mmap
+   REPORT pid=209 P1-alone     model-file mapping: vmas=1 perms=rw-p Size=36900 Rss=36900 Pss=36900 Shared_Clean=0 Shared_Dirty=0 Private_Clean=36900 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=209 P1-alone     whole process:      Rss=102868 Pss=101906 Pss_Anon=45764 Pss_File=56142 kB (smaps_rollup) | RssAnon=45764 RssFile=57104 kB (status)
+   REPORT pid=209 P1-with-P2   model-file mapping: vmas=1 perms=rw-p Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=209 P1-with-P2   whole process:      Rss=102868 Pss=73960 Pss_Anon=45764 Pss_File=28196 kB (smaps_rollup) | RssAnon=45764 RssFile=57104 kB (status)
+   REPORT pid=211 P2-with-P1   model-file mapping: vmas=1 perms=rw-p Size=36900 Rss=36900 Pss=18450 Shared_Clean=36900 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=211 P2-with-P1   whole process:      Rss=102872 Pss=73964 Pss_Anon=45768 Pss_File=28196 kB (smaps_rollup) | RssAnon=45768 RssFile=57104 kB (status)
+SUMMARY mlp.ort path-mmap: model-file mapping Pss 36900 kB alone -> 18450 kB with a second process; whole-process Pss 101906 -> 73960 kB; Pss_Anon 45764 -> 45764 kB; both processes together 147924 kB Pss (one alone: 101906 kB)
+
+== share model=/work/models/tree.ort variant=bytes+init
+   REPORT pid=214 P1-alone     model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=3132 Shared_Clean=0 Shared_Dirty=0 Private_Clean=3132 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=214 P1-alone     whole process:      Rss=33604 Pss=32642 Pss_Anon=10012 Pss_File=22630 kB (smaps_rollup) | RssAnon=10012 RssFile=23592 kB (status)
+   REPORT pid=214 P1-with-P2   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=1566 Shared_Clean=3132 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=214 P1-with-P2   whole process:      Rss=33604 Pss=21452 Pss_Anon=10012 Pss_File=11440 kB (smaps_rollup) | RssAnon=10012 RssFile=23592 kB (status)
+   REPORT pid=216 P2-with-P1   model-file mapping: vmas=1 perms=r--s Size=3132 Rss=3132 Pss=1566 Shared_Clean=3132 Shared_Dirty=0 Private_Clean=0 Private_Dirty=0 Anonymous=0 kB
+   REPORT pid=216 P2-with-P1   whole process:      Rss=33608 Pss=21456 Pss_Anon=10016 Pss_File=11440 kB (smaps_rollup) | RssAnon=10016 RssFile=23592 kB (status)
+SUMMARY tree.ort bytes+init: model-file mapping Pss 3132 kB alone -> 1566 kB with a second process; whole-process Pss 32642 -> 21452 kB; Pss_Anon 10012 -> 10012 kB; both processes together 42908 kB Pss (one alone: 32642 kB)
+

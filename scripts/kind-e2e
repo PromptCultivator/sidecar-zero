@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# The Kind end-to-end tests (kubernetes-deploy §10): build the images, then run
+# deploy/kind/e2e.py in the dev image with the Docker socket, so that Kind can make its nodes.
+#
+#   scripts/kind-e2e                       every test on the default Kubernetes version
+#   scripts/kind-e2e --k8s=1.35 kill       one test on another version
+#   scripts/kind-e2e --matrix              the kill test on every version, then everything else
+#   scripts/kind-e2e --list                the tests
+#   scripts/kind-e2e --no-build ...        skip the image build
+#
+# Clusters are named scz-e2e-*, made for the run and deleted after it (--keep leaves them).
+# Each needs about 2 GB of the Docker VM's memory; one exists at a time.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+build=1
+args=()
+for a in "$@"; do
+  case "$a" in
+    --no-build) build=0 ;;
+    --list) build=0; args+=("$a") ;;
+    *) args+=("$a") ;;
+  esac
+done
+[ "$build" = 1 ] && deploy/docker/build.sh dev
+SCZ_DOCKER=1 exec scripts/dev python3 -u deploy/kind/e2e.py ${args[@]+"${args[@]}"}

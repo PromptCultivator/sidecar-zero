@@ -1,0 +1,13 @@
+restarts: 0   last exit: 
+--- log of the first container instance
+supervisor: pid 1 uid 1000, effective capabilities 0000000000000000
+  memory.max                         100663296 
+  memory.oom.group                   0 
+  our oom_score_adj                  988 
+round 1: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 1 oom_group_kill 0 
+round 2: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 2 oom_group_kill 0 
+round 3: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 3 oom_group_kill 0 
+RESULT supervisor survived 3 worker OOMs; standby survived

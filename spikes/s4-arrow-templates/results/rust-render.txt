@@ -1,0 +1,8 @@
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/launch.maxrows.align8.stream (33160 bytes, 32 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/launch.maxrows.align64.stream (33224 bytes, 32 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/prims.maxrows.align8.stream (2712 bytes, 100 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/prims.maxrows.align64.stream (2888 bytes, 100 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/nullable.maxrows.align8.stream (2776 bytes, 100 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/nullable.maxrows.align64.stream (3144 bytes, 100 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/nullable-rendered-without-nulls.maxrows.align8.stream (2712 bytes, 100 rows)
+arrow-rs arrow-ipc 60.1.0: wrote /s4/results/rust-render/nullable-rendered-without-nulls.maxrows.align64.stream (2888 bytes, 100 rows)

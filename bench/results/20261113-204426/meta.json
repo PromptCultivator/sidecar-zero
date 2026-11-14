@@ -1,0 +1,37 @@
+{
+  "quick": true,
+  "repeats": 1,
+  "kills": 10,
+  "systems": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "hosts": [
+    "rust",
+    "java"
+  ],
+  "environment": {
+    "kernel": "6.12.76-linuxkit",
+    "arch": "aarch64",
+    "cpus": 10,
+    "cpu": "0x000",
+    "governor": "unavailable",
+    "cgroup": "v2",
+    "vm": true,
+    "commit": "974eda0",
+    "dirty": true,
+    "onnxruntime": "1.31.1",
+    "triton": "nvcr.io/nvidia/tritonserver@sha256:aa5fca20416939f243d587d56557d15f9d2bb81de30c6a4464707225250320fb"
+  },
+  "supervisor_stripped_bytes": 856480,
+  "started": "2026-11-13T20:44:28Z",
+  "inference_ns": {
+    "fraud": 8576,
+    "mlp": 14848
+  },
+  "finished": "2026-11-13T21:12:11Z",
+  "failed": []
+}

@@ -1,0 +1,19 @@
+helper: memfd scz-ctl  fd=3 len=65536 seals=0x17 (asked 0x17)
+helper: memfd scz-data fd=4 len=8388608 seals=0x7 (asked 0x7)
+helper: listening on /tmp/scz-s3.sock pid=9
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF
+helper: client connected, HELLO 8 bytes 0x4f4c4c4548
+helper: client EOF

@@ -1,0 +1,45 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk25-arm64 -cp /spike/classes S3 /tmp/scz-s3.sock handshake atomics futex
+S3 spike: java.version=25.0.5 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=43
+modes=[handshake, atomics, futex]
+[a] socket fd=4 connected to /tmp/scz-s3.sock (SOCK_SEQPACKET|SOCK_CLOEXEC)
+[a] recvmsg returned 24 bytes; magic ok=true ctl_len=65536 data_len=8388608
+[a] msg_controllen=24 msg_flags=0x40000000 (MSG_CTRUNC set=false) cmsg_len=24 level=1 type=1
+[a] SCM_RIGHTS descriptors: control fd=5 data fd=6
+[a] fcntl(F_GETFD): control=0x1 data=0x1 socket=0x1  (FD_CLOEXEC=1 expected on all three)
+[a] lseek(fd,0,SEEK_END): control=65536 (want 65536) data=8388608 (want 8388608)
+[a] fcntl(F_GET_SEALS): control=0x17 (want superset of 0x17: true)  data=0x7 (want superset of 0x7: true)
+[b] mmap(control, PROT_READ, MAP_SHARED)            = 0xffffb9010000
+[b] mmap(control, PROT_READ|PROT_WRITE, MAP_SHARED) = -1 errno=EPERM(1)   (must fail)
+[b] mprotect(control mapping, PROT_READ|PROT_WRITE) = -1 errno=EACCES(13)   (must fail)
+[b] mmap(data, PROT_READ|PROT_WRITE, MAP_SHARED)    = 0xffff53800000
+[b] madvise(control, MADV_POPULATE_READ)=0  madvise(data, MADV_POPULATE_WRITE)=0
+[b] magic read through the segments: control ok=true data ok=true; control header data_len=8388608
+
+[a] --- variadic downcalls (os.arch=aarch64) ---
+[a] fcntl(data, F_DUPFD_CLOEXEC, 100) with firstVariadicArg(2) = 100  (>=100 expected: true)
+[a] fcntl(control, F_ADD_SEALS, F_SEAL_WRITE) = -1 errno=EPERM(1)  (EPERM expected: F_SEAL_SEAL is set)
+[a] syscall(SYS_getpid=172) with firstVariadicArg(1) = 43 ; getpid() = 43 ; equal=true
+[a] syscall(SYS_lseek=62, data, 0, SEEK_END) = 8388608 ; equal to data_len=true
+[a] syscall(SYS_futex=98, addr, FUTEX_WAKE, 1, 0, 0, 0) with no waiters = 0 (0 expected)
+[a] linked WITHOUT firstVariadicArg (for the record): fcntl(F_DUPFD_CLOEXEC,100)=100  syscall(SYS_lseek)=8388608
+[a] nanoTime-to-CLOCK_MONOTONIC offset from calibration: -20 ns
+
+[c] --- VarHandle access on MemorySegment ---
+[c] int word: setVolatile(7); compareAndSet(7->8)=true; compareAndSet(7->9)=false; getVolatile=8
+[c] long word: setRelease/getAcquire=0x1122334455667788; compareAndSet->42=true; getOpaque=42; getAndAdd(8) returned 42; weakCompareAndSet(50->51)=true; now 51
+[c] 4 threads x 1000000 compareAndSet increments on one word: final=4000000 (want 4000000)
+[c] control word read-only here: 0x1111, then after the helper stores through its own mapping: 0x2222
+[c] write to asReadOnly() control segment threw: java.lang.IllegalArgumentException: Attempt to write a read-only segment
+[c] read 8 bytes at data_len-4 threw: java.lang.IndexOutOfBoundsException: Out of bound access on segment MemorySegment{ kind: native, address: 0xffff53800000, byteSize: 8388608 }; new offset = 8388604; new length = 8
+[c] long access at a misaligned offset threw: java.lang.IllegalArgumentException: Target offset 12292 is incompatible with alignment constraint 8 (of j8) for segment MemorySegment{ kind: native, address: 0xffff53800000, byteSize: 8388608 }
+
+[d] --- futex through syscall() downcall: FUTEX_WAIT_BITSET, shared, absolute CLOCK_MONOTONIC deadline ---
+[d] wait(expected 0, deadline +5000 ms), helper stores 1 and wakes after 200 ms: returned 0 errno=- after 200 ms; word=1; helper's FUTEX_WAKE reported 1 woken
+[d] same, handle without errno capture, deadline from nanoTime()+offset: returned 0 after 200 ms; helper reported 1 woken
+[d] wait(deadline +300 ms), nobody wakes: returned -1 errno=ETIMEDOUT(110) after 300415 us
+[d] wait with a stale expected value: returned -1 errno=EAGAIN(11) after 156 us
+[d] wait with a deadline 1 ms in the past: returned -1 errno=ETIMEDOUT(110) after 412 us
+[d] in-process: FUTEX_WAKE from main returned 1; waiter returned 0 after 152 ms
+
+S3 spike: modes [handshake, atomics, futex] completed
+[exit status 0]

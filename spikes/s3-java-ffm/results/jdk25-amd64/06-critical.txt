@@ -1,0 +1,18 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk25-amd64 -cp /spike/classes S3 /tmp/scz-s3.sock critical
+S3 spike: java.version=25.0.5 vm=OpenJDK 64-Bit Server VM os.arch=amd64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=72
+modes=[critical]
+
+[h] --- Linker.Option.critical(...) together with captureCallState("errno") ---
+[h] critical(false) + captureCallState("errno"): linked, type (MemorySegment,int)int
+[h]     close(-1) through it returned -1, captured errno=EBADF(9) (EBADF expected)
+[h] critical(true) + captureCallState("errno"): linked, type (MemorySegment,int)int
+[h]     close(-1) through it returned -1, captured errno=EBADF(9) (EBADF expected)
+[h] critical(false) alone: linked, close(-1) returned -1
+[h] critical(false) + firstVariadicArg(1): linked, syscall(SYS_getpid) returned 72 (getpid()=72)
+
+[h] --- a thread blocked 1500 ms in usleep(); another thread calls System.gc() 200 ms in ---
+[h] ordinary downcall: System.gc() took 42 ms
+[h] critical(false) downcall: System.gc() took 1316 ms
+
+S3 spike: modes [critical] completed
+[exit status 0]

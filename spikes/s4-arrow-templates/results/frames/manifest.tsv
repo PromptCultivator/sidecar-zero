@@ -1,0 +1,50 @@
+launch.r32.template	matrix	launch	32	template	launch.schema.msg	launch.r32.template.frame
+launch.r1.template	matrix	launch	1	template	launch.schema.msg	launch.r1.template.frame
+launch.r17.template	matrix	launch	17	template	launch.schema.msg	launch.r17.template.frame
+launch.r1.packed	isolation	launch	1	packed	launch.schema.msg	launch.r1.packed.frame
+launch.r1.longbody	isolation	launch	1	longbody	launch.schema.msg	launch.r1.longbody.frame
+launch.r1.spaced	isolation	launch	1	spaced	launch.schema.msg	launch.r1.spaced.frame
+launch.r17.packed	isolation	launch	17	packed	launch.schema.msg	launch.r17.packed.frame
+launch.r17.longbody	isolation	launch	17	longbody	launch.schema.msg	launch.r17.longbody.frame
+launch.r17.spaced	isolation	launch	17	spaced	launch.schema.msg	launch.r17.spaced.frame
+launch.r32.packed	isolation	launch	32	packed	launch.schema.msg	launch.r32.packed.frame
+launch.r32.longbody	isolation	launch	32	longbody	launch.schema.msg	launch.r32.longbody.frame
+launch.r32.spaced	isolation	launch	32	spaced	launch.schema.msg	launch.r32.spaced.frame
+launch.r17.x-buffer-past-body	extra	launch	17	values length > body	launch.schema.msg	launch.r17.x-buffer-past-body.frame
+launch.r17.x-zero-gaps	extra	launch	17	template with gaps zeroed	launch.schema.msg	launch.r17.x-zero-gaps.frame
+launch.r32.rs-template	matrix-rs	launch	32	rs-template	launch.rs.schema.msg	launch.r32.rs-template.frame
+launch.r1.rs-template	matrix-rs	launch	1	rs-template	launch.rs.schema.msg	launch.r1.rs-template.frame
+launch.r17.rs-template	matrix-rs	launch	17	rs-template	launch.rs.schema.msg	launch.r17.rs-template.frame
+prims.r100.template	matrix	prims	100	template	prims.schema.msg	prims.r100.template.frame
+prims.r1.template	matrix	prims	1	template	prims.schema.msg	prims.r1.template.frame
+prims.r37.template	matrix	prims	37	template	prims.schema.msg	prims.r37.template.frame
+prims.r1.packed	isolation	prims	1	packed	prims.schema.msg	prims.r1.packed.frame
+prims.r1.longbody	isolation	prims	1	longbody	prims.schema.msg	prims.r1.longbody.frame
+prims.r1.spaced	isolation	prims	1	spaced	prims.schema.msg	prims.r1.spaced.frame
+prims.r37.packed	isolation	prims	37	packed	prims.schema.msg	prims.r37.packed.frame
+prims.r37.longbody	isolation	prims	37	longbody	prims.schema.msg	prims.r37.longbody.frame
+prims.r37.spaced	isolation	prims	37	spaced	prims.schema.msg	prims.r37.spaced.frame
+prims.r100.packed	isolation	prims	100	packed	prims.schema.msg	prims.r100.packed.frame
+prims.r100.longbody	isolation	prims	100	longbody	prims.schema.msg	prims.r100.longbody.frame
+prims.r100.spaced	isolation	prims	100	spaced	prims.schema.msg	prims.r100.spaced.frame
+prims.r100.rs-template	matrix-rs	prims	100	rs-template	prims.rs.schema.msg	prims.r100.rs-template.frame
+prims.r1.rs-template	matrix-rs	prims	1	rs-template	prims.rs.schema.msg	prims.r1.rs-template.frame
+prims.r37.rs-template	matrix-rs	prims	37	rs-template	prims.rs.schema.msg	prims.r37.rs-template.frame
+nullable.r100.template	matrix	nullable	100	template	nullable.schema.msg	nullable.r100.template.frame
+nullable.r1.template	matrix	nullable	1	template	nullable.schema.msg	nullable.r1.template.frame
+nullable.r37.template	matrix	nullable	37	template	nullable.schema.msg	nullable.r37.template.frame
+nullable.r1.packed	isolation	nullable	1	packed	nullable.schema.msg	nullable.r1.packed.frame
+nullable.r1.longbody	isolation	nullable	1	longbody	nullable.schema.msg	nullable.r1.longbody.frame
+nullable.r1.spaced	isolation	nullable	1	spaced	nullable.schema.msg	nullable.r1.spaced.frame
+nullable.r37.packed	isolation	nullable	37	packed	nullable.schema.msg	nullable.r37.packed.frame
+nullable.r37.longbody	isolation	nullable	37	longbody	nullable.schema.msg	nullable.r37.longbody.frame
+nullable.r37.spaced	isolation	nullable	37	spaced	nullable.schema.msg	nullable.r37.spaced.frame
+nullable.r100.packed	isolation	nullable	100	packed	nullable.schema.msg	nullable.r100.packed.frame
+nullable.r100.longbody	isolation	nullable	100	longbody	nullable.schema.msg	nullable.r100.longbody.frame
+nullable.r100.spaced	isolation	nullable	100	spaced	nullable.schema.msg	nullable.r100.spaced.frame
+nullable.r37.x-nullcount-zero	extra	nullable	37	null counts left at 0	nullable.schema.msg	nullable.r37.x-nullcount-zero.frame
+nullable.r37.x-nullcount-off-by-one	extra	nullable	37	null count of col 0 one too high	nullable.schema.msg	nullable.r37.x-nullcount-off-by-one.frame
+nullable.r37.x-dirty-trailing-bits	extra	nullable	37	bits past rows set in bitmap	nullable.schema.msg	nullable.r37.x-dirty-trailing-bits.frame
+nullable.r100.rs-template	matrix-rs	nullable	100	rs-template	nullable.rs.schema.msg	nullable.r100.rs-template.frame
+nullable.r1.rs-template	matrix-rs	nullable	1	rs-template	nullable.rs.schema.msg	nullable.r1.rs-template.frame
+nullable.r37.rs-template	matrix-rs	nullable	37	rs-template	nullable.rs.schema.msg	nullable.r37.rs-template.frame

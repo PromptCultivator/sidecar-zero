@@ -1,0 +1,858 @@
+{
+ "launch/pyarrow": {
+  "prefix_len": 192,
+  "body_len": 32768,
+  "frame_cap": 32960,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "17": 17,
+     "32": 32
+    }
+   },
+   {
+    "prefix_off": 144,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (features)",
+    "values": {
+     "1": 1,
+     "17": 17,
+     "32": 32
+    }
+   },
+   {
+    "prefix_off": 160,
+    "kind": "ROWS_SCALED",
+    "scale": 256,
+    "field": "nodes[1].length (features)",
+    "values": {
+     "1": 256,
+     "17": 4352,
+     "32": 8192
+    }
+   },
+   {
+    "prefix_off": 128,
+    "kind": "ROWS_SCALED",
+    "scale": 1024,
+    "field": "buffers[2].length (features values)",
+    "values": {
+     "1": 1024,
+     "17": 17408,
+     "32": 32768
+    }
+   }
+  ],
+  "null_counts": [],
+  "columns": [
+   {
+    "name": "features",
+    "values_off": 192,
+    "row_bytes": 1024,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   }
+  ]
+ },
+ "launch/arrow-rs": {
+  "prefix_len": 192,
+  "body_len": 32768,
+  "frame_cap": 32960,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "17": 17,
+     "32": 32
+    }
+   },
+   {
+    "prefix_off": 88,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (features)",
+    "values": {
+     "1": 1,
+     "17": 17,
+     "32": 32
+    }
+   },
+   {
+    "prefix_off": 104,
+    "kind": "ROWS_SCALED",
+    "scale": 256,
+    "field": "nodes[1].length (features)",
+    "values": {
+     "1": 256,
+     "17": 4352,
+     "32": 8192
+    }
+   },
+   {
+    "prefix_off": 168,
+    "kind": "ROWS_SCALED",
+    "scale": 1024,
+    "field": "buffers[2].length (features values)",
+    "values": {
+     "1": 1024,
+     "17": 17408,
+     "32": 32768
+    }
+   }
+  ],
+  "null_counts": [],
+  "columns": [
+   {
+    "name": "features",
+    "values_off": 192,
+    "row_bytes": 1024,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   }
+  ]
+ },
+ "prims/pyarrow": {
+  "prefix_len": 320,
+  "body_len": 2240,
+  "frame_cap": 2560,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 224,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (id)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 240,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[1].length (amount)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 256,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[2].length (count)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 272,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[3].length (flag)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 112,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[1].length (id values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 144,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[3].length (amount values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 176,
+    "kind": "ROWS_SCALED",
+    "scale": 4,
+    "field": "buffers[5].length (count values)",
+    "values": {
+     "1": 4,
+     "37": 148,
+     "100": 400
+    }
+   },
+   {
+    "prefix_off": 208,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "buffers[7].length (flag values)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   }
+  ],
+  "null_counts": [],
+  "columns": [
+   {
+    "name": "id",
+    "values_off": 320,
+    "row_bytes": 8,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "amount",
+    "values_off": 1152,
+    "row_bytes": 8,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "count",
+    "values_off": 1984,
+    "row_bytes": 4,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "flag",
+    "values_off": 2432,
+    "row_bytes": 1,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   }
+  ]
+ },
+ "prims/arrow-rs": {
+  "prefix_len": 320,
+  "body_len": 2240,
+  "frame_cap": 2560,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 88,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (id)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 104,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[1].length (amount)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 120,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[2].length (count)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 136,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[3].length (flag)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 184,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[1].length (id values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 216,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[3].length (amount values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 248,
+    "kind": "ROWS_SCALED",
+    "scale": 4,
+    "field": "buffers[5].length (count values)",
+    "values": {
+     "1": 4,
+     "37": 148,
+     "100": 400
+    }
+   },
+   {
+    "prefix_off": 280,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "buffers[7].length (flag values)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   }
+  ],
+  "null_counts": [],
+  "columns": [
+   {
+    "name": "id",
+    "values_off": 320,
+    "row_bytes": 8,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "amount",
+    "values_off": 1152,
+    "row_bytes": 8,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "count",
+    "values_off": 1984,
+    "row_bytes": 4,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   },
+   {
+    "name": "flag",
+    "values_off": 2432,
+    "row_bytes": 1,
+    "validity_off": 0,
+    "null_count_off": 0,
+    "nullable": false
+   }
+  ]
+ },
+ "nullable/pyarrow": {
+  "prefix_len": 320,
+  "body_len": 2496,
+  "frame_cap": 2816,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 224,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (id)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 240,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[1].length (amount)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 256,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[2].length (count)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 272,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[3].length (flag)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 96,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[0].length (id validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 112,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[1].length (id values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 128,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[2].length (amount validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 144,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[3].length (amount values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 160,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[4].length (count validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 176,
+    "kind": "ROWS_SCALED",
+    "scale": 4,
+    "field": "buffers[5].length (count values)",
+    "values": {
+     "1": 4,
+     "37": 148,
+     "100": 400
+    }
+   },
+   {
+    "prefix_off": 192,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[6].length (flag validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 208,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "buffers[7].length (flag values)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   }
+  ],
+  "null_counts": [
+   {
+    "prefix_off": 232,
+    "column": "id",
+    "values": {
+     "1": 0,
+     "37": 12,
+     "100": 33
+    }
+   },
+   {
+    "prefix_off": 248,
+    "column": "amount",
+    "values": {
+     "1": 0,
+     "37": 9,
+     "100": 25
+    }
+   },
+   {
+    "prefix_off": 264,
+    "column": "count",
+    "values": {
+     "1": 0,
+     "37": 0,
+     "100": 0
+    }
+   },
+   {
+    "prefix_off": 280,
+    "column": "flag",
+    "values": {
+     "1": 1,
+     "37": 19,
+     "100": 50
+    }
+   }
+  ],
+  "columns": [
+   {
+    "name": "id",
+    "values_off": 384,
+    "row_bytes": 8,
+    "validity_off": 320,
+    "null_count_off": 232,
+    "nullable": true
+   },
+   {
+    "name": "amount",
+    "values_off": 1280,
+    "row_bytes": 8,
+    "validity_off": 1216,
+    "null_count_off": 248,
+    "nullable": true
+   },
+   {
+    "name": "count",
+    "values_off": 2176,
+    "row_bytes": 4,
+    "validity_off": 2112,
+    "null_count_off": 264,
+    "nullable": true
+   },
+   {
+    "name": "flag",
+    "values_off": 2688,
+    "row_bytes": 1,
+    "validity_off": 2624,
+    "null_count_off": 280,
+    "nullable": true
+   }
+  ]
+ },
+ "nullable/arrow-rs": {
+  "prefix_len": 320,
+  "body_len": 2496,
+  "frame_cap": 2816,
+  "rows_field_off": 72,
+  "patches": [
+   {
+    "prefix_off": 72,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "RecordBatch.length",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 88,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[0].length (id)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 104,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[1].length (amount)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 120,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[2].length (count)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 136,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "nodes[3].length (flag)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   },
+   {
+    "prefix_off": 168,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[0].length (id validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 184,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[1].length (id values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 200,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[2].length (amount validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 216,
+    "kind": "ROWS_SCALED",
+    "scale": 8,
+    "field": "buffers[3].length (amount values)",
+    "values": {
+     "1": 8,
+     "37": 296,
+     "100": 800
+    }
+   },
+   {
+    "prefix_off": 232,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[4].length (count validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 248,
+    "kind": "ROWS_SCALED",
+    "scale": 4,
+    "field": "buffers[5].length (count values)",
+    "values": {
+     "1": 4,
+     "37": 148,
+     "100": 400
+    }
+   },
+   {
+    "prefix_off": 264,
+    "kind": "BITMAP_BYTES",
+    "scale": 0,
+    "field": "buffers[6].length (flag validity)",
+    "values": {
+     "1": 1,
+     "37": 5,
+     "100": 13
+    }
+   },
+   {
+    "prefix_off": 280,
+    "kind": "ROWS_SCALED",
+    "scale": 1,
+    "field": "buffers[7].length (flag values)",
+    "values": {
+     "1": 1,
+     "37": 37,
+     "100": 100
+    }
+   }
+  ],
+  "null_counts": [
+   {
+    "prefix_off": 96,
+    "column": "id",
+    "values": {
+     "1": 0,
+     "37": 12,
+     "100": 33
+    }
+   },
+   {
+    "prefix_off": 112,
+    "column": "amount",
+    "values": {
+     "1": 0,
+     "37": 9,
+     "100": 25
+    }
+   },
+   {
+    "prefix_off": 128,
+    "column": "count",
+    "values": {
+     "1": 0,
+     "37": 0,
+     "100": 0
+    }
+   },
+   {
+    "prefix_off": 144,
+    "column": "flag",
+    "values": {
+     "1": 1,
+     "37": 19,
+     "100": 50
+    }
+   }
+  ],
+  "columns": [
+   {
+    "name": "id",
+    "values_off": 384,
+    "row_bytes": 8,
+    "validity_off": 320,
+    "null_count_off": 96,
+    "nullable": true
+   },
+   {
+    "name": "amount",
+    "values_off": 1280,
+    "row_bytes": 8,
+    "validity_off": 1216,
+    "null_count_off": 112,
+    "nullable": true
+   },
+   {
+    "name": "count",
+    "values_off": 2176,
+    "row_bytes": 4,
+    "validity_off": 2112,
+    "null_count_off": 128,
+    "nullable": true
+   },
+   {
+    "name": "flag",
+    "values_off": 2688,
+    "row_bytes": 1,
+    "validity_off": 2624,
+    "null_count_off": 144,
+    "nullable": true
+   }
+  ]
+ }
+}

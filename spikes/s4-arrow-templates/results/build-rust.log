@@ -1,0 +1,43 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 613B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [stage-0 1/5] FROM docker.io/library/rust:1@sha256:8a4e90c7946b74626488b1446f712c0fe0ed1a596cbd3d871684bc9c5433ae07
+#4 resolve docker.io/library/rust:1@sha256:8a4e90c7946b74626488b1446f712c0fe0ed1a596cbd3d871684bc9c5433ae07 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 118B done
+#5 DONE 0.0s
+
+#6 [stage-0 2/5] WORKDIR /s4/rust
+#6 CACHED
+
+#7 [stage-0 3/5] COPY Cargo.toml Cargo.lock* ./
+#7 CACHED
+
+#8 [stage-0 4/5] COPY src ./src
+#8 CACHED
+
+#9 [stage-0 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry,id=scz-spike-s4-cargo-registry     --mount=type=cache,target=/s4/rust/target,id=scz-spike-s4-cargo-target     cargo build --release -j 4 && cp target/release/s4-rust /usr/local/bin/s4-rust     && cargo tree --depth 1 > /s4/rust/versions.txt && rustc --version >> /s4/rust/versions.txt
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:28f26960f4ca796e5649e51210bf5af41579a9485b7318a8940fa84ca1d4bddc done
+#10 exporting config sha256:1440a94817fd9ae8c36f3ded6512bd018d27b1ab1831d38fc5573c57db95ae28 done
+#10 exporting attestation manifest sha256:1bedfc40ca884e1072d9edb63ca53ac8723e6d27b5333042fe285fb73e5f589d
+#10 exporting attestation manifest sha256:1bedfc40ca884e1072d9edb63ca53ac8723e6d27b5333042fe285fb73e5f589d 0.0s done
+#10 exporting manifest list sha256:6b59e0a93854bf316928f35c60f95e454cb1ec3723fb7fb1fd3ecf4db16c8c60 done
+#10 naming to docker.io/library/scz-spike-s4-rust:latest done
+#10 unpacking to docker.io/library/scz-spike-s4-rust:latest done
+#10 DONE 0.1s

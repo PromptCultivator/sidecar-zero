@@ -1,0 +1,22 @@
+# Build the dev image scripts/dev runs everything in, under the tag scripts/dev looks for (a
+# hash of scripts/dev.Dockerfile), with its layers cached between runs: the image downloads
+# and builds ONNX Runtime, llama.cpp, and every SDK's toolchain, which takes far longer than
+# loading it from the cache.
+name: dev-image
+description: Build or restore the pinned dev image
+runs:
+  using: composite
+  steps:
+    - uses: docker/setup-buildx-action@v3
+    - name: The tag scripts/dev expects
+      id: tag
+      shell: bash
+      run: echo "image=scz-dev:1.99-$(sha256sum < scripts/dev.Dockerfile | cut -c1-12)" >> "$GITHUB_OUTPUT"
+    - uses: docker/build-push-action@v6
+      with:
+        context: scripts
+        file: scripts/dev.Dockerfile
+        tags: ${{ steps.tag.outputs.image }}
+        load: true
+        cache-from: type=gha,scope=dev-${{ runner.arch }}
+        cache-to: type=gha,mode=max,scope=dev-${{ runner.arch }}

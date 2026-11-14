@@ -1,0 +1,4 @@
+host: Docker Desktop, kernel 6.12.76-linuxkit, aarch64, 10 CPUs
+Core dumps ON (ulimit -c unlimited; core_pattern: core); 5 runs per row
+segv-consume       0 MiB   0.656/ 1.794/  1.794   0.720/ 1.852/  1.852   1.213/ 2.142/  2.142  worker ended by signal 11, core dumped; first report from lock 0 in 2 of 5; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-consume     512 MiB  289.041/361.445/361.445  289.121/361.638/361.638  322.295/418.485/418.485  worker ended by signal 11, core dumped; first report from lock 0 in 4 of 5; consume thread ran after its report: 0; runtime threads ran after the first report in 0

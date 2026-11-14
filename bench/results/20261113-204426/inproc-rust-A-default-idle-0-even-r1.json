@@ -1,0 +1,1 @@
+{"host": "rust", "mode": "inproc", "system": "A", "variant": "default", "scenario": "idle", "duration_s": 10, "sidecar_cpu_ratio": 0.019995977301268026}

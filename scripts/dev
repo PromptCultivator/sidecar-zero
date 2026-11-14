@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Run a command in the Linux build container, with this repository mounted at /w.
+#
+#   scripts/dev cargo test --workspace
+#   scripts/dev cargo run -p scz-abi-gen
+#   scripts/dev loom [FILTER]              the loom models (RUSTFLAGS="--cfg loom", release)
+#   scripts/dev cargo clippy --workspace --all-targets
+#
+# Everything touching memfd, seals, futex, or pidfds is Linux-only, so on macOS this is how
+# the workspace is built and tested. On Linux it works the same way. Needs only Docker.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+# The image is built from scripts/dev.Dockerfile (a pinned toolchain, ONNX Runtime, and the
+# Python model tools) and tagged with a hash of that file, so an edit rebuilds it.
+HASH=$( (shasum -a 256 2>/dev/null || sha256sum) < scripts/dev.Dockerfile | cut -c1-12)
+IMAGE=${SCZ_DEV_IMAGE:-scz-dev:1.99-$HASH}
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "building $IMAGE from scripts/dev.Dockerfile" >&2
+  docker build -q -t "$IMAGE" -f scripts/dev.Dockerfile scripts >/dev/null
+fi
+ARGS=(--rm -i -v "$PWD:/w" -w /w -e SCZ_IN_DEV=1
+      -v scz-dev-cargo:/usr/local/cargo/registry
+      -v scz-dev-target:/w/target
+      --ulimit core=0 --cap-add SYS_PTRACE)
+[ -t 0 ] && ARGS+=(-t)
+# The deployment tests drive Kind, which drives Docker: SCZ_DOCKER=1 hands the container the
+# Docker socket (scripts/kind-e2e). Nothing else gets it.
+# The benchmark also starts sibling containers from this image (bench/run.py, system B), so it
+# is told the image's tag and where the repository is on the Docker host.
+[ "${SCZ_DOCKER:-}" = 1 ] && ARGS+=(-v /var/run/docker.sock:/var/run/docker.sock -e "SCZ_DEV_IMAGE=$IMAGE" -e "SCZ_HOST_REPO=$PWD")
+if [ "${1:-}" = loom ]; then
+  shift
+  exec docker run "${ARGS[@]}" -e RUSTFLAGS="--cfg loom" -e LOOM_MAX_PREEMPTIONS="${LOOM_MAX_PREEMPTIONS:-3}" \
+    -e CARGO_TARGET_DIR=/w/target/loom "$IMAGE" cargo test -p scz-shm --release --test loom "$@"
+fi
+exec docker run "${ARGS[@]}" "$IMAGE" "$@"

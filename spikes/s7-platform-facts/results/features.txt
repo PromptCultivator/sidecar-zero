@@ -1,0 +1,24 @@
+kernel 6.12.76-linuxkit aarch64, page size 4096
+
+memfd_create with sealing                                  yes  
+supervisor maps it writable before sealing                 yes  
+MADV_POPULATE_WRITE                                        yes  
+seal GROW|SHRINK|FUTURE_WRITE|SEAL with a writable map held yes  
+seals read back                                            yes  F_GET_SEALS = 0x17
+supervisor's existing mapping still writes                 yes  
+a NEW writable mapping is refused                          yes  errno 1 (Operation not permitted)
+a new read-only shared mapping is allowed                  yes  
+mprotect cannot add write to it                            yes  errno 13 (Permission denied)
+the file cannot be resized                                 yes  
+write() through the descriptor is refused                  yes  
+MADV_POPULATE_READ on the read-only mapping                yes  
+futex wait on the read-only mapping is woken               yes  returned 0 errno 0 after 103.031 ms, word now 1
+FUTEX_WAIT_BITSET with an absolute deadline times out      yes  errno 110 after 20.930 ms
+the supervisor's wake found the sleeper                    yes  FUTEX_WAKE returned 1
+pidfd_open                                                 yes  
+close_range                                                yes  
+Landlock                                                   yes  ABI version 6
+cgroup v2 (cgroup.controllers present)                     yes  
+memory pressure file in this cgroup                        yes  
+system-wide pressure file                                  yes  
+memory.oom.group in this cgroup                            yes  

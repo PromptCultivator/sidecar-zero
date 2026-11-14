@@ -1,0 +1,37 @@
+arrow-rs arrow-ipc 60.1.0: template frames read from a region that starts `shift` bytes past a page boundary
+  launch.r17.template    shift=0
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  launch.r17.template    shift=8
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  launch.r17.template    shift=4
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  launch.r17.template    shift=1
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=false
+      StreamDecoder with_require_alignment(true):           REJECTED: Invalid argument error: Misaligned buffers[0] in array of type Float32, offset from expected alignment of 4 by 1
+  prims.r37.template     shift=0
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  prims.r37.template     shift=8
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  prims.r37.template     shift=4
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=false
+      StreamDecoder with_require_alignment(true):           REJECTED: Invalid argument error: Misaligned buffers[0] in array of type Int64, offset from expected alignment of 8 by 4
+  prims.r37.template     shift=1
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=false
+      StreamDecoder with_require_alignment(true):           REJECTED: Invalid argument error: Misaligned buffers[0] in array of type Int64, offset from expected alignment of 8 by 1
+  nullable.r37.template  shift=0
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  nullable.r37.template  shift=8
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=true
+      StreamDecoder with_require_alignment(true):           accepted, values correct, zero-copy=true
+  nullable.r37.template  shift=4
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=false
+      StreamDecoder with_require_alignment(true):           REJECTED: Invalid argument error: Misaligned buffers[0] in array of type Int64, offset from expected alignment of 8 by 4
+  nullable.r37.template  shift=1
+      read_record_batch (default, require_alignment=false): accepted, values correct, zero-copy=false
+      StreamDecoder with_require_alignment(true):           REJECTED: Invalid argument error: Misaligned buffers[0] in array of type Int64, offset from expected alignment of 8 by 1

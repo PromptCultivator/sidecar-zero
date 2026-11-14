@@ -1,0 +1,63 @@
+
+######## session option keys, as spelled in include/onnxruntime_session_options_config_keys.h
+47-// will be used. Use this to override the usage of env allocators on a per session level.
+48:static const char* const kOrtSessionOptionsConfigUseEnvAllocators = "session.use_env_allocators";
+--
+220-// Thread spinning is disabled by default for client/on-device workloads to reduce cpu utilization and improve power efficiency.
+221:static const char* const kOrtSessionOptionsConfigAllowInterOpSpinning = "session.inter_op.allow_spinning";
+222:static const char* const kOrtSessionOptionsConfigAllowIntraOpSpinning = "session.intra_op.allow_spinning";
+--
+262-// has to guarantee that the model bytes are valid until the ORT session using the model bytes is destroyed.
+263:static const char* const kOrtSessionOptionsConfigUseORTModelBytesDirectly = "session.use_ort_model_bytes_directly";
+--
+272-static const char* const kOrtSessionOptionsConfigUseORTModelBytesForInitializers =
+273:    "session.use_ort_model_bytes_for_initializers";
+--
+282-/// </summary>
+283:static const char* const kOrtSessionOptionsConfigUseMemoryMappedOrtModel = "session.use_memory_mapped_ort_model";
+--
+874-// Equivalent to OrtApi::DisableCpuMemArena / OrtApi::EnableCpuMemArena.
+875:static const char* const kOrtSessionOptionsConfigEnableCpuMemArena = "session.enable_cpu_mem_arena";
+--
+879-// Equivalent to OrtApi::DisableMemPattern / OrtApi::EnableMemPattern.
+880:static const char* const kOrtSessionOptionsConfigEnableMemPattern = "session.enable_mem_pattern";
+
+######## run option key, as spelled in include/onnxruntime_run_options_config_keys.h
+19-// Key for enabling shrinkages of user listed device memory arenas.
+20-// Expects a list of semi-colon separated key value pairs separated by colon in the following format:
+21-// "device_0:device_id_0;device_1:device_id_1"
+22-// No white-spaces allowed in the provided list string.
+23-// Currently, the only supported devices are : "cpu", "gpu" (case sensitive).
+24-// If "cpu" is included in the list, DisableCpuMemArena() API must not be called (i.e.) arena for cpu should be enabled.
+25-// Example usage: "cpu:0;gpu:0" (or) "gpu:0"
+26-// By default, the value for this key is empty (i.e.) no memory arenas are shrunk
+27:static const char* const kOrtRunOptionsConfigEnableMemoryArenaShrinkage = "memory.enable_memory_arena_shrinkage";
+
+######## the same strings inside the shipped binary (strings -a libonnxruntime.so)
+52373:session.use_memory_mapped_ort_model
+52374:session.use_memory_mapped_ort_model is ignored when loading from a buffer.
+52375:session.use_ort_model_bytes_directly
+52463:session.use_ort_model_bytes_for_initializers
+52486:session.use_env_allocators
+52591:memory.enable_memory_arena_shrinkage
+
+######## arena configuration keys accepted by OrtApi::CreateArenaCfgV2 (include/onnxruntime_c_api.h)
+3434:   * "max_mem": Maximum memory that can be allocated by the arena based allocator.
+3436:   * "arena_extend_strategy": 0 = kNextPowerOfTwo, 1 = kSameAsRequested.
+3438:   * "initial_chunk_size_bytes": (Possible) Size of the first allocation in the arena.
+3441:   * "max_dead_bytes_per_chunk": Threshold of unused memory in an allocated chunk of arena memory after
+3443:   * "initial_growth_chunk_size_bytes": (Possible) Size of the second allocation in the arena.
+3445:   * "max_power_of_two_extend_bytes": The maximum extend size if arena strategy is `kNextPowerOfTwo`.
+
+######## s5 options
+ONNX Runtime version string (OrtGetApiBase()->GetVersionString()): 1.31.1
+ORT_API_VERSION compiled against: 31
+AddSessionConfigEntry("session.use_ort_model_bytes_directly", "1") -> ok
+AddSessionConfigEntry("session.use_ort_model_bytes_for_initializers", "1") -> ok
+AddSessionConfigEntry("session.use_env_allocators", "1") -> ok
+AddSessionConfigEntry("session.intra_op.allow_spinning", "1") -> ok
+AddSessionConfigEntry("session.this_key_does_not_exist", "1") -> ok
+AddRunConfigEntry("memory.enable_memory_arena_shrinkage", "cpu:0") -> ok
+AddRunConfigEntry("memory.this_key_does_not_exist", "cpu:0") -> ok
+note: a config entry is a string in a map. A made-up key is accepted too, so acceptance alone
+      proves nothing. Whether a key has an effect is shown by behaviour, in the other tests.

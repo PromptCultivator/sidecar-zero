@@ -1,0 +1,259 @@
+== zerocopy model=/work/models/tree.ort rows=1 profile=A
+slot mapping        [0xffffb3811000, 0xffffb3816000)  memfd, MAP_SHARED, 20480 bytes
+request values at   0xffffb3812000 = mapping+0x1000, 1024 bytes (address % 64 = 0)
+response values at  0xffffb3814000 = mapping+0x3000, 4 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaaaf6d7d440, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffffb3812000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffffb3814000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (4 bytes): yes
+  bytes after the 4 response bytes still hold the 0xA5 sentinel (4092 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: -2.230007 -2.230007 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 4 B)    allocations=16 bytes=687 sizes=[24,35,37,37,37,40,40,56,1,32,160,64,32,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=11 bytes=383 sizes=[35,37,37,37,40,40,56,1,32,28,40]
+  allocated only by the control: [24,24,32,64,160]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 1024 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffffb38123c4 pc=0xffffb2f05648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT response page=0 WRITE addr=0xffffb3814000 pc=0xffffb24a3c98 module=/opt/ort/lib/libonnxruntime.so.1 offset=0x513c98
+  request pages: 1, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 2 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/tree.ort rows=1 profile=A: PASS
+
+== zerocopy model=/work/models/tree.ort rows=32 profile=A
+slot mapping        [0xffff9a1e4000, 0xffff9a1f0000)  memfd, MAP_SHARED, 49152 bytes
+request values at   0xffff9a1e5000 = mapping+0x1000, 32768 bytes (address % 64 = 0)
+response values at  0xffff9a1ee000 = mapping+0xa000, 128 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaaad051ee00, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffff9a1e5000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffff9a1ee000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (128 bytes): yes
+  bytes after the 128 response bytes still hold the 0xA5 sentinel (3968 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: -2.230007 -1.287402 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 128 B)  allocations=17 bytes=1839 sizes=[24,35,37,37,37,40,40,56,1,32,160,192,32,1024,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=12 bytes=1407 sizes=[35,37,37,37,40,40,56,1,32,1024,28,40]
+  allocated only by the control: [24,24,32,160,192]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 32768 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffff9a1e53c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=1 read  addr=0xffff9a1e63c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=2 read  addr=0xffff9a1e73c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=3 read  addr=0xffff9a1e83c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=4 read  addr=0xffff9a1e93c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=5 read  addr=0xffff9a1ea3c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=6 read  addr=0xffff9a1eb3c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=7 read  addr=0xffff9a1ec3c4 pc=0xffff9b385648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT response page=0 WRITE addr=0xffff9a1ee000 pc=0xffff9a923ebc module=/opt/ort/lib/libonnxruntime.so.1 offset=0x513ebc
+  request pages: 8, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 9 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/tree.ort rows=32 profile=A: PASS
+
+== zerocopy model=/work/models/mlp.ort rows=1 profile=A
+slot mapping        [0xffffb03bf000, 0xffffb03c4000)  memfd, MAP_SHARED, 20480 bytes
+request values at   0xffffb03c0000 = mapping+0x1000, 1024 bytes (address % 64 = 0)
+response values at  0xffffb03c2000 = mapping+0x3000, 4 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaaad9902440, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffffb03c0000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffffb03c2000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (4 bytes): yes
+  bytes after the 4 response bytes still hold the 0xA5 sentinel (4092 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: 0.3167854 0.3167854 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 4 B)    allocations=29 bytes=26286 sizes=[24,35,37,37,37,40,40,56,240,8,32,160,16448,32,64,24,160,8256,32,64,24,160,64,32,64,24,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=24 bytes=25982 sizes=[35,37,37,37,40,40,56,240,8,32,160,16448,32,64,24,160,8256,32,64,24,64,24,28,40]
+  allocated only by the control: [24,24,32,64,160]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 1024 B): [16448,8256]
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffffb03c0000 pc=0xffffafabb524 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8b524
+  FAULT response page=0 WRITE addr=0xffffb03c2000 pc=0xffffaefb9400 module=/opt/ort/lib/libonnxruntime.so.1 offset=0x489400
+  request pages: 1, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 2 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/mlp.ort rows=1 profile=A: PASS
+
+== zerocopy model=/work/models/mlp.ort rows=32 profile=A
+slot mapping        [0xffffabc64000, 0xffffabc70000)  memfd, MAP_SHARED, 49152 bytes
+request values at   0xffffabc65000 = mapping+0x1000, 32768 bytes (address % 64 = 0)
+response values at  0xffffabc6e000 = mapping+0xa000, 128 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaab0282a540, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffffabc65000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffffabc6e000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (128 bytes): yes
+  bytes after the 128 response bytes still hold the 0xA5 sentinel (3968 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: 0.3167854 0.536051 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 128 B)  allocations=29 bytes=788270 sizes=[24,35,37,37,37,40,40,56,240,8,32,160,524352,32,64,24,160,262208,32,64,24,160,192,32,64,24,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=24 bytes=787838 sizes=[35,37,37,37,40,40,56,240,8,32,160,524352,32,64,24,160,262208,32,64,24,64,24,28,40]
+  allocated only by the control: [24,24,32,160,192]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 32768 B): [524352,262208]
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffffabc65000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=1 read  addr=0xffffabc66000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=2 read  addr=0xffffabc67000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=3 read  addr=0xffffabc68000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=4 read  addr=0xffffabc69000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=5 read  addr=0xffffabc6a000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=6 read  addr=0xffffabc6b000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=7 read  addr=0xffffabc6c000 pc=0xfffface1adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT response page=0 WRITE addr=0xffffabc6e000 pc=0xffffac3193e0 module=/opt/ort/lib/libonnxruntime.so.1 offset=0x4893e0
+  request pages: 8, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 9 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/mlp.ort rows=32 profile=A: PASS
+
+== zerocopy model=/work/models/tree.ort rows=2 profile=A
+slot mapping        [0xffffb08fb000, 0xffffb0900000)  memfd, MAP_SHARED, 20480 bytes
+request values at   0xffffb08fc000 = mapping+0x1000, 2048 bytes (address % 64 = 0)
+response values at  0xffffb08fe000 = mapping+0x3000, 8 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaaabeccef40, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffffb08fc000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffffb08fe000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (8 bytes): yes
+  bytes after the 8 response bytes still hold the 0xA5 sentinel (4088 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: -2.230007 -1.287402 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 8 B)    allocations=17 bytes=1711 sizes=[24,35,37,37,37,40,40,56,1,32,160,64,32,1024,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=12 bytes=1407 sizes=[35,37,37,37,40,40,56,1,32,1024,28,40]
+  allocated only by the control: [24,24,32,64,160]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 2048 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffffb08fc3c4 pc=0xffffaffe5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT response page=0 WRITE addr=0xffffb08fe000 pc=0xffffaf583ebc module=/opt/ort/lib/libonnxruntime.so.1 offset=0x513ebc
+  request pages: 1, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 2 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/tree.ort rows=2 profile=A: PASS
+
+== zerocopy model=/work/models/tree.ort rows=64 profile=A
+slot mapping        [0xffff9bf5d000, 0xffff9bf71000)  memfd, MAP_SHARED, 81920 bytes
+request values at   0xffff9bf5e000 = mapping+0x1000, 65536 bytes (address % 64 = 0)
+response values at  0xffff9bf6f000 = mapping+0x12000, 256 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaab1d310ec0, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffff9bf5e000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffff9bf6f000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (256 bytes): yes
+  bytes after the 256 response bytes still hold the 0xA5 sentinel (3840 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: -2.230007 -1.287402 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 256 B)  allocations=17 bytes=1967 sizes=[24,35,37,37,37,40,40,56,1,32,160,320,32,1024,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=12 bytes=1407 sizes=[35,37,37,37,40,40,56,1,32,1024,28,40]
+  allocated only by the control: [24,24,32,160,320]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 65536 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffff9bf5e3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=1 read  addr=0xffff9bf5f3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=2 read  addr=0xffff9bf603c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=3 read  addr=0xffff9bf613c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=4 read  addr=0xffff9bf623c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=5 read  addr=0xffff9bf633c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=6 read  addr=0xffff9bf643c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=7 read  addr=0xffff9bf653c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=8 read  addr=0xffff9bf663c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=9 read  addr=0xffff9bf673c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=10 read  addr=0xffff9bf683c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=11 read  addr=0xffff9bf693c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=12 read  addr=0xffff9bf6a3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=13 read  addr=0xffff9bf6b3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=14 read  addr=0xffff9bf6c3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=15 read  addr=0xffff9bf6d3c4 pc=0xffff9df55648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT response page=0 WRITE addr=0xffff9bf6f000 pc=0xffff9d4f3ebc module=/opt/ort/lib/libonnxruntime.so.1 offset=0x513ebc
+  request pages: 16, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 17 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/tree.ort rows=64 profile=A: PASS
+
+== zerocopy model=/work/models/tree.ort rows=32 profile=B
+slot mapping        [0xffff92854000, 0xffff92860000)  memfd, MAP_SHARED, 49152 bytes
+request values at   0xffff92855000 = mapping+0x1000, 32768 bytes (address % 64 = 0)
+response values at  0xffff9285e000 = mapping+0xa000, 128 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xaaab16f85640, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffff92855000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffff9285e000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (128 bytes): yes
+  bytes after the 128 response bytes still hold the 0xA5 sentinel (3968 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: -2.230007 -1.287402 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 128 B)  allocations=17 bytes=1695 sizes=[24,35,37,37,37,40,40,56,48,1,32,160,32,1024,28,40,24]
+  fast path: input over slot, output bound to slot     allocations=13 bytes=1455 sizes=[35,37,37,37,40,40,56,48,1,32,1024,28,40]
+  allocated only by the control: [24,24,32,160]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 32768 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffff928553c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=1 read  addr=0xffff928563c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=2 read  addr=0xffff928573c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=3 read  addr=0xffff928583c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=4 read  addr=0xffff928593c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=5 read  addr=0xffff9285a3c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=6 read  addr=0xffff9285b3c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT request  page=7 read  addr=0xffff9285c3c4 pc=0xffff91fa5648 module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf75648
+  FAULT response page=0 WRITE addr=0xffff9285e000 pc=0xffff91543ebc module=/opt/ort/lib/libonnxruntime.so.1 offset=0x513ebc
+  request pages: 8, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 9 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/tree.ort rows=32 profile=B: PASS
+
+== zerocopy model=/work/models/mlp.ort rows=32 profile=B
+slot mapping        [0xffff80074000, 0xffff80080000)  memfd, MAP_SHARED, 49152 bytes
+request values at   0xffff80075000 = mapping+0x1000, 32768 bytes (address % 64 = 0)
+response values at  0xffff8007e000 = mapping+0xa000, 128 bytes (address % 64 = 0)
+reference run (normal API): output tensor allocated by the runtime at 0xffff7ac93040, outside the slot mapping
+[1] pointers
+  input  OrtValue data pointer  0xffff80075000  == request values address
+  bound output (GetBoundOutputValues) data pointer  0xffff8007e000  == response values address
+[2] bytes
+  response region equals reference output bit for bit (128 bytes): yes
+  bytes after the 128 response bytes still hold the 0xA5 sentinel (3968 bytes checked): yes
+  pread() of the memfd at the response offset returns the same bytes (seen through the descriptor, not our mapping): yes
+  first scores: 0.3167854 0.536051 ...
+[3] allocations made inside Run (recorded by libmhook.so)
+  self-check: malloc(12345) + OrtAllocator.Alloc(54321) allocations=2 bytes=66745 sizes=[12345,54400]
+  control: output NOT bound (runtime allocates 128 B)  allocations=29 bytes=1646 sizes=[24,35,37,37,37,40,40,56,240,48,8,32,160,32,64,24,160,32,64,24,160,40,32,64,24,28,40,40,24]
+  fast path: input over slot, output bound to slot     allocations=24 bytes=1366 sizes=[35,37,37,37,40,40,56,240,48,8,32,160,32,64,24,160,32,64,24,64,24,28,40,40]
+  allocated only by the control: [24,24,32,40,160]   only by the fast path: []
+  fast path allocations big enough to hold the request (>= 32768 B): []
+[4] first touch of each slot page during Run (mprotect + SIGSEGV)
+  FAULT request  page=0 read  addr=0xffff80075000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=1 read  addr=0xffff80076000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=2 read  addr=0xffff80077000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=3 read  addr=0xffff80078000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=4 read  addr=0xffff80079000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=5 read  addr=0xffff8007a000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=6 read  addr=0xffff8007b000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT request  page=7 read  addr=0xffff8007c000 pc=0xffff8122adac module=/opt/ort/lib/libonnxruntime.so.1 offset=0xf8adac
+  FAULT response page=0 WRITE addr=0xffff8007e000 pc=0xffff807293e0 module=/opt/ort/lib/libonnxruntime.so.1 offset=0x4893e0
+  request pages: 8, each first read once: yes; writes to request pages: 0
+  response pages written: 1; all 9 faulting instructions are inside libonnxruntime: yes
+  response still equals reference after the probe run: yes
+RESULT zerocopy model=/work/models/mlp.ort rows=32 profile=B: PASS
+

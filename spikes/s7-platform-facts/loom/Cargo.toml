@@ -1,0 +1,11 @@
+[package]
+name = "s7-loom"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+loom = "0.7"
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(loom)'] }

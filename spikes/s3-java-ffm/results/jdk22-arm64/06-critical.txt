@@ -1,0 +1,16 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk22-arm64 -cp /spike/classes S3 /tmp/scz-s3.sock critical
+S3 spike: java.version=22.0.2 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=215
+modes=[critical]
+
+[h] --- Linker.Option.critical(...) together with captureCallState("errno") ---
+[h] critical(false) + captureCallState("errno"): threw java.lang.IllegalArgumentException: Incompatible linker options: captureCallState, critical
+[h] critical(true) + captureCallState("errno"): threw java.lang.IllegalArgumentException: Incompatible linker options: captureCallState, critical
+[h] critical(false) alone: linked, close(-1) returned -1
+[h] critical(false) + firstVariadicArg(1): linked, syscall(SYS_getpid) returned 215 (getpid()=215)
+
+[h] --- a thread blocked 1500 ms in usleep(); another thread calls System.gc() 200 ms in ---
+[h] ordinary downcall: System.gc() took 3 ms
+[h] critical(false) downcall: System.gc() took 1310 ms
+
+S3 spike: modes [critical] completed
+[exit status 0]

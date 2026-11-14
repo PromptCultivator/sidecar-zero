@@ -1,0 +1,56 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk25-arm64 -cp /spike/classes S3 /tmp/scz-s3.sock arena
+S3 spike: java.version=25.0.5 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=164
+modes=[arena]
+
+[f] --- a platform thread parked in futex on an address inside a shared Arena that another thread closes ---
+[f] mappings of memfd:scz-data before the tests (the connection's own): 1
+
+[f1] --- parked thread: address passed as a plain long (the design); errno capture: false; after close: nobody wakes, deadline +3000 ms ---
+[f1] t=505 ms: parked thread state=RUNNABLE alive=true; mappings of memfd:scz-data in /proc/self/maps: 2
+[f1] cleanup action ran on thread 'main': munmap(0xffff4a3ac000, 8388608) = 0
+[f1] Arena.close() returned normally after 3345 us
+[f1] after close: seg.scope().isAlive()=false; mappings of memfd:scz-data: 1; parked thread alive=true state=RUNNABLE
+[f1] a NEW futex wait on the now-unmapped address returned -1 errno=EFAULT(14)
+[f1] parked thread: futex returned -1 errno=(not captured) at t=3007 ms
+[f1] parked thread then read the segment: threw java.lang.IllegalStateException: Already closed
+[f1] parked thread then wrote the segment: threw java.lang.IllegalStateException: Already closed
+[f1] parked thread finished=true at t=3009 ms
+
+[f2] --- parked thread: address passed as a plain long (the design); errno capture: true; after close: nobody wakes, deadline +3000 ms ---
+[f2] t=504 ms: parked thread state=RUNNABLE alive=true; mappings of memfd:scz-data in /proc/self/maps: 2
+[f2] cleanup action ran on thread 'main': munmap(0xffff4a3ac000, 8388608) = 0
+[f2] Arena.close() returned normally after 1412 us
+[f2] after close: seg.scope().isAlive()=false; mappings of memfd:scz-data: 1; parked thread alive=true state=RUNNABLE
+[f2] a NEW futex wait on the now-unmapped address returned -1 errno=EFAULT(14)
+[f2] parked thread: futex returned -1 errno=ETIMEDOUT(110) at t=3002 ms
+[f2] parked thread then read the segment: threw java.lang.IllegalStateException: Already closed
+[f2] parked thread then wrote the segment: threw java.lang.IllegalStateException: Already closed
+[f2] parked thread finished=true at t=3003 ms
+
+[f3] --- parked thread: address passed as a plain long (the design); errno capture: false; after close: helper issues FUTEX_WAKE on the same file offset ---
+[f3] t=502 ms: parked thread state=RUNNABLE alive=true; mappings of memfd:scz-data in /proc/self/maps: 2
+[f3] cleanup action ran on thread 'main': munmap(0xffff4a3ac000, 8388608) = 0
+[f3] Arena.close() returned normally after 1747 us
+[f3] after close: seg.scope().isAlive()=false; mappings of memfd:scz-data: 1; parked thread alive=true state=RUNNABLE
+[f3] a NEW futex wait on the now-unmapped address returned -1 errno=EFAULT(14)
+[f3] t=812 ms: helper stored 1 and called FUTEX_WAKE on its own mapping of that offset: 1 woken
+[f3] parked thread: futex returned 0 errno=(not captured) at t=812 ms
+[f3] parked thread then read the segment: threw java.lang.IllegalStateException: Already closed
+[f3] parked thread then wrote the segment: threw java.lang.IllegalStateException: Already closed
+[f3] parked thread finished=true at t=814 ms
+
+[f4] --- parked thread: segment passed to the downcall as ADDRESS; errno capture: false; after close: nobody wakes, deadline +3000 ms ---
+[f4] t=502 ms: parked thread state=RUNNABLE alive=true; mappings of memfd:scz-data in /proc/self/maps: 2
+[f4] Arena.close() threw after 116 us: java.lang.IllegalStateException: Session is acquired by 1 clients
+[f4] after close: seg.scope().isAlive()=true; mappings of memfd:scz-data: 2; parked thread alive=true state=RUNNABLE
+[f4] parked thread: futex returned -1 errno=(not captured) at t=3006 ms
+[f4] parked thread then read the segment: OK, value 0
+[f4] parked thread then wrote the segment: OK
+[f4] parked thread finished=true at t=3014 ms
+[f4] cleanup action ran on thread 'main': munmap(0xffff4a3ac000, 8388608) = 0
+[f4] second Arena.close(), after the call returned: ok after 1986 us; mappings of memfd:scz-data: 1
+
+[f] JVM still running after all four cases; connection's own data segment still readable: magic ok=true
+
+S3 spike: modes [arena] completed
+[exit status 0]

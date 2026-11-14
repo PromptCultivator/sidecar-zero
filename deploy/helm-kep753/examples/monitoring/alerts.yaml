@@ -1,0 +1,128 @@
+# The alerts of kubernetes-deploy §9, as a Prometheus Operator PrometheusRule. An example to
+# adapt: thresholds and durations depend on the service, and the labels a rule is grouped by
+# depend on how pods are scraped (the PodMonitor in the library chart adds namespace and pod).
+#
+# The scz_* series without "client" come from the sidecar's /metrics (supervisor §7); the
+# scz_client_* series come from the host application, through its SDK's export (sdk-contract
+# §8). scripts/check fails if a rule here names a metric neither exports.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sidecarzero
+spec:
+  groups:
+    - name: sidecarzero.serving
+      rules:
+        - alert: SidecarZeroModelServingDegraded
+          expr: |
+            sum by (namespace, pod) (rate(scz_client_calls_total{source="fallback"}[5m]))
+              / sum by (namespace, pod) (rate(scz_client_calls_total[5m])) > 0.05
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: More than 5% of calls are answered by the fallback
+            description: Break the fallbacks down by reason (scz_client_calls_total{reason}) to see why.
+        - alert: SidecarZeroCallersShedding
+          expr: max by (namespace, pod) (scz_client_breaker_open) > 0
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: Callers are shedding load (their breaker is open)
+            description: The worker cannot keep up with the request rate; it is undersized for the load.
+        - alert: SidecarZeroResponsesRejected
+          expr: increase(scz_client_rejects_total[10m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: Clients refused responses that failed their checks
+            description: The worker wrote responses that did not match the request; repeated refusals condemn it.
+        - alert: SidecarZeroRingFaults
+          expr: increase(scz_client_ring_faults_total[10m]) > 0
+          labels: { severity: critical }
+          annotations:
+            summary: Clients reported inconsistent ring words
+            description: Something wrote to the shared rings that should not have; the supervisor resets the session.
+
+    - name: sidecarzero.workers
+      rules:
+        - alert: SidecarZeroWorkerCrashLoop
+          expr: scz_worker_crashloop == 1
+          for: 1m
+          labels: { severity: critical }
+          annotations:
+            summary: The worker keeps dying and is restarted with backoff
+        - alert: SidecarZeroHandoverFailed
+          expr: increase(scz_handoffs_total{result="failed"}[10m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: A handover to a new worker did not complete
+            description: The old worker died or was condemned during a reload or a memory relief.
+        - alert: SidecarZeroModelRolledBack
+          expr: increase(scz_model_rollbacks_total[30m]) > 0
+          labels: { severity: critical }
+          annotations:
+            summary: A new model was rolled back to the previous one
+            description: Fix what the model path points at; the rejected file is not loaded again until it changes.
+        - alert: SidecarZeroModelLoadTimedOut
+          expr: increase(scz_load_timeouts_total[30m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: A model load took longer than worker.loadTimeoutSeconds and was killed
+        - alert: SidecarZeroSessionResetRequested
+          expr: increase(scz_session_resets_total{cause!="host_exit"}[10m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: The session was reset for a cause other than the host leaving
+        - alert: SidecarZeroSessionResetStuck
+          expr: scz_session_reset_stuck == 1
+          for: 1m
+          labels: { severity: critical }
+          annotations:
+            summary: A requested session reset waits for a client that has not closed its socket
+            description: The gate stays closed until it does; the host process may be wedged.
+
+    - name: sidecarzero.memory
+      rules:
+        - alert: SidecarZeroMemoryShedding
+          expr: avg_over_time(scz_shedding[10m]) > 0.1
+          labels: { severity: warning }
+          annotations:
+            summary: The gate spent over a tenth of the last 10 minutes shedding for memory
+        - alert: SidecarZeroModelDoesNotFit
+          expr: scz_model_fit == 0
+          for: 1m
+          labels: { severity: critical }
+          annotations:
+            summary: A worker alone is above the relief threshold; the model does not fit the memory limit
+        - alert: SidecarZeroStandbySuppressed
+          expr: scz_standby_suppressed == 1
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: No warm standby for memory reasons, so a worker death means a cold start
+        - alert: SidecarZeroOomShieldInactive
+          expr: scz_oom_shield_mode{mode="none"} == 1
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: No OOM shield is in effect; a kernel OOM kill could take the supervisor with it
+        - alert: SidecarZeroKernelOom
+          expr: increase(scz_kernel_oom_events_total[10m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: The kernel's OOM killer ran in the sidecar's cgroup
+
+    - name: sidecarzero.sidecar
+      rules:
+        - alert: SidecarZeroDegraded
+          expr: scz_degraded == 1
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: The sidecar started degraded and serves only fallbacks
+            description: /modelz names the cause (an old kernel, no cgroup v2 files, no model file).
+        - alert: SidecarZeroRestarted
+          # From kube-state-metrics.
+          expr: increase(kube_pod_container_status_restarts_total{container="sidecarzero"}[15m]) > 0
+          labels: { severity: warning }
+          annotations:
+            summary: The sidecar container restarted

@@ -1,0 +1,66 @@
+# S1 in Kubernetes: a native sidecar (an init container that keeps running) hands the
+# two segments to an app container that runs as a different user. The pod meets the
+# "restricted" security standard, which is what the Helm chart will ship.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scz-s1
+spec:
+  restartPolicy: Never
+  securityContext:
+    fsGroup: 2000
+    seccompProfile: { type: RuntimeDefault }
+  volumes:
+    - name: sock
+      emptyDir: {}
+  initContainers:
+    - name: sidecar
+      image: scz-spike-s1
+      imagePullPolicy: Never
+      restartPolicy: Always
+      command: ["/spike/sup", "--prefault=PREFAULT", "--data-mb=64", "--stay"]
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: { drop: ["ALL"] }
+      resources:
+        requests: { memory: 256Mi, cpu: 100m }
+        limits: { memory: 256Mi }
+      volumeMounts: [{ name: sock, mountPath: /run/scz }]
+      startupProbe:
+        exec: { command: ["test", "-S", "/run/scz/scz.sock"] }
+        periodSeconds: 1
+        failureThreshold: 30
+  containers:
+    - name: app
+      image: scz-spike-s1
+      imagePullPolicy: Never
+      command: ["/spike/cli"]
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: { drop: ["ALL"] }
+      resources:
+        requests: { memory: 256Mi, cpu: 100m }
+        limits: { memory: 256Mi }
+      volumeMounts: [{ name: sock, mountPath: /run/scz }]
+    - name: seccomp-probe
+      image: scz-spike-s1
+      imagePullPolicy: Never
+      command: ["/spike/clone3_probe"]
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: { drop: ["ALL"] }
+      resources:
+        requests: { memory: 32Mi, cpu: 50m }
+        limits: { memory: 32Mi }

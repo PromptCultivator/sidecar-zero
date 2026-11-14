@@ -1,0 +1,7 @@
+joined, returns normally           tid=7  alive before: tgkill=1 /proc=1   after exit: tgkill=0 /proc=0   reported gone after 0.564 ms
+joined, raw exit (no unwinding)    tid=8  alive before: tgkill=1 /proc=1   after exit: tgkill=0 /proc=0   reported gone after 0.029 ms
+detached, raw exit (no unwinding)  tid=9  alive before: tgkill=1 /proc=1   after exit: tgkill=0 /proc=0   reported gone after 0.021 ms
+live thread reported gone in 1,000,000 checks: 0
+dead tid 9 not reused within 20,000 new threads (pid_max=99999)
+
+VERDICT thread_liveness: PASS

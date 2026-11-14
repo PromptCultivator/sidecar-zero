@@ -1,0 +1,9 @@
+validate: ok
+validateFull: java.lang.UnsupportedOperationException
+    at org.apache.arrow.vector.complex.FixedSizeListVector.getOffsetBuffer(FixedSizeListVector.java:472)
+    at org.apache.arrow.vector.validate.ValidateVectorDataVisitor.validateOffsetBuffer(ValidateVectorDataVisitor.java:44)
+    at org.apache.arrow.vector.validate.ValidateVectorDataVisitor.visit(ValidateVectorDataVisitor.java:140)
+    at org.apache.arrow.vector.validate.ValidateVectorDataVisitor.visit(ValidateVectorDataVisitor.java:38)
+    at org.apache.arrow.vector.complex.FixedSizeListVector.accept(FixedSizeListVector.java:586)
+    at org.apache.arrow.vector.util.ValueVectorUtility.validateFull(ValueVectorUtility.java:115)
+    at s4.FslValidateProbe.main(FslValidateProbe.java:34)

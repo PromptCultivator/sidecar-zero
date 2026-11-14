@@ -1,0 +1,11 @@
+supervisor: while client holds its end: messages=1 end-of-stream=0
+supervisor: after client close: poll=1 [POLLIN POLLRDHUP POLLHUP ] recv=0
+client: after supervisor SHUT_WR: poll=1 [POLLIN POLLRDHUP ] recv=0
+CLIENT_SAW_EOF=1
+client: send after peer's SHUT_WR -> 5 (errno 0)
+client: closed its end
+
+Q1 client reads end-of-stream after the supervisor's SHUT_WR ........ YES
+Q2 supervisor sees nothing while the client keeps its end open ...... YES
+Q3 supervisor sees end-of-stream once the client closes ............ YES
+VERDICT halfclose: PASS

@@ -1,0 +1,86 @@
+Instructions at the program counters recorded in 02-zero-copy.txt ('=>' marks the faulting one).
+The library is stripped: there are no function names, the instruction itself is the evidence.
+
+---- /opt/ort/lib/libonnxruntime.so.1 0xf75648  (seen 34 times)
+     f75630:	ldr	x0, [x0, #8]
+     f75634:	b	f755f8 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0xc24898>
+     f75638:	cbz	w1, f7507c <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0xc2431c>
+     f7563c:	nop
+     f75640:	ldrsw	x1, [x0]
+     f75644:	ldr	s23, [x0, #4]
+=>   f75648:	ldr	s22, [x9, x1, lsl #2]
+     f7564c:	fcmpe	s23, s22
+     f75650:	b.ge	f756cc <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0xc2496c>  // b.tcont
+     f75654:	add	x0, x0, #0x18
+
+---- /opt/ort/lib/libonnxruntime.so.1 0xf8adac  (seen 16 times)
+     f8ad94:	movi	v31.16b, #0x0
+     f8ad98:	add	x10, x0, x6, lsl #2
+     f8ad9c:	add	x11, x10, x6, lsl #2
+     f8ada0:	add	x12, x11, x6, lsl #2
+     f8ada4:	sub	x9, x3, #0x4
+     f8ada8:	tbnz	x9, #63, f8aee4 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0xc3a184>
+=>   f8adac:	ldr	q8, [x0], #16
+     f8adb0:	ldr	q9, [x10], #16
+     f8adb4:	ldr	q10, [x11], #16
+     f8adb8:	ldr	q11, [x12], #16
+
+---- /opt/ort/lib/libonnxruntime.so.1 0x513ebc  (seen 4 times)
+     513ea4:	fadd	s31, s31, s30
+     513ea8:	str	s31, [x25]
+     513eac:	cmp	x0, #0x4
+     513eb0:	b.eq	514640 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x1c38e0>  // b.none
+     513eb4:	ldr	x0, [sp, #8]
+     513eb8:	add	x25, x25, #0x8
+=>   513ebc:	str	s31, [x0, x21, lsl #2]
+     513ec0:	add	x21, x21, #0x1
+     513ec4:	cmp	x27, x21
+     513ec8:	b.ne	513e90 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x1c3130>  // b.any
+
+---- /opt/ort/lib/libonnxruntime.so.1 0x4893e0  (seen 2 times)
+     4893c8:	lsr	x1, x2, #2
+     4893cc:	mov	x0, x23
+     4893d0:	dup	v30.4s, v31.s[0]
+     4893d4:	add	x1, x23, x1, lsl #4
+     4893d8:	nop
+     4893dc:	nop
+=>   4893e0:	str	q30, [x0], #16
+     4893e4:	cmp	x1, x0
+     4893e8:	b.ne	4893e0 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x138680>  // b.any
+     4893ec:	and	x0, x2, #0xfffffffffffffffc
+
+---- /opt/ort/lib/libonnxruntime.so.1 0xf8b524  (seen 1 times)
+     f8b50c:	movi	v16.16b, #0x0
+     f8b510:	movi	v17.16b, #0x0
+     f8b514:	movi	v18.16b, #0x0
+     f8b518:	movi	v19.16b, #0x0
+     f8b51c:	sub	x9, x3, #0x4
+     f8b520:	tbnz	x9, #63, f8b590 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0xc3a830>
+=>   f8b524:	ldr	q8, [x0], #16
+     f8b528:	ldp	q4, q5, [x1], #256
+     f8b52c:	ldp	q6, q7, [x1, #-224]
+     f8b530:	fmla	v16.4s, v4.4s, v8.s[0]
+
+---- /opt/ort/lib/libonnxruntime.so.1 0x513c98  (seen 1 times)
+     513c80:	ldr	x0, [x24, #16]
+     513c84:	ldr	s31, [x24, #32]
+     513c88:	fadd	s15, s15, s31
+     513c8c:	cmp	x0, #0x4
+     513c90:	b.eq	5143e4 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x1c3684>  // b.none
+     513c94:	ldr	x0, [sp, #8]
+=>   513c98:	str	s15, [x0]
+     513c9c:	ldr	d15, [sp, #464]
+     513ca0:	b	5137f8 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x1c2a98>
+     513ca4:	cbnz	x12, 513cb0 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x1c2f50>
+
+---- /opt/ort/lib/libonnxruntime.so.1 0x489400  (seen 1 times)
+     4893e8:	b.ne	4893e0 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x138680>  // b.any
+     4893ec:	and	x0, x2, #0xfffffffffffffffc
+     4893f0:	add	x23, x23, x0, lsl #2
+     4893f4:	tst	x2, #0x3
+     4893f8:	b.eq	4894f0 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x138790>  // b.none
+     4893fc:	mov	x0, x23
+=>   489400:	str	s31, [x0], #4
+     489404:	cmp	x3, x0
+     489408:	b.eq	4894f0 <OrtSessionOptionsAppendExecutionProvider_CPU@@VERS_1.31.1+0x138790>  // b.none
+     48940c:	add	x0, x23, #0x8

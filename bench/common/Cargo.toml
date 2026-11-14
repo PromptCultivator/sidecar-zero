@@ -1,0 +1,19 @@
+[package]
+name = "scz-bench-common"
+description = "What the benchmark's host, baseline server, and load generator share: the scorer, the reference fallback, histograms, and the result format (bench §5)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = ["ort"]
+# The model scorer (systems C, D, E); the load generator does without it, and without ONNX Runtime.
+ort = ["dep:scz-worker-ort"]
+
+[dependencies]
+scz-worker-ort = { path = "../../crates/scz-worker-ort", optional = true }
+libc.workspace = true
+
+[lints]
+workspace = true

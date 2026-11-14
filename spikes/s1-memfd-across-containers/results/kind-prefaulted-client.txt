@@ -1,0 +1,13 @@
+client: uid 1001 gid 1001
+client     at start                                   current    1.50 MiB   shmem    0.00 MiB   anon   0.06 MiB   pagetables  0.04 MiB
+client: received 2 descriptors; close-on-exec set: yes
+client: seals  control 0x17   data 0x7   (GROW 0x4, SHRINK 0x2, SEAL 0x1, FUTURE_WRITE 0x10)
+CHECK control segment refuses a writable mapping ............ PASS (errno 1)
+CHECK control segment maps read-only and reads correctly .... PASS
+CHECK mprotect cannot make it writable ...................... PASS (errno 13)
+CHECK the data segment cannot be shrunk under the others .... PASS
+client     after mapping and populating page tables   current    1.25 MiB   shmem    0.00 MiB   anon   0.06 MiB   pagetables  0.16 MiB
+client     after writing every page                   current    1.16 MiB   shmem    0.00 MiB   anon   0.06 MiB   pagetables  0.16 MiB
+RESULT the client's cgroup grew by -0.34 MiB (shmem 0.00 MiB) after writing 64 MiB
+CHECK futex wait on the read-only mapping, woken across containers  PASS (returned 0, errno 0, after 101.1 ms)
+VERDICT client checks: PASS

@@ -1,0 +1,5 @@
+clone3: failed, errno 38 (Function not implemented)
+clone + CLONE_PIDFD: returned pid 11, pidfd 3, pidfd became readable on exit: yes
+
+RESULT clone3=refused fallback=works
+VERDICT clone: PASS (a worker can be spawned with a pidfd)

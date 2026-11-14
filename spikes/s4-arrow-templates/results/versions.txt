@@ -1,0 +1,35 @@
+date: 2026-11-12T12:10:36Z
+docker server: 29.5.3 linux/arm64
+docker VM: kernel 6.12.76-linuxkit, 10 CPUs, 8321515520 bytes of memory, Docker Desktop
+container: Linux 6.12.76-linuxkit aarch64
+--- python
+python 3.12.16
+pyarrow 26.0.1 / Arrow C++ 26.0.1 release
+--- rust
+s4-rust v0.0.0 (/s4/rust)
+├── arrow-array v60.1.0
+├── arrow-buffer v60.1.0
+├── arrow-data v60.1.0
+├── arrow-ipc v60.1.0
+├── arrow-schema v60.1.0
+└── libc v0.2.191
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+--- go
+go version go1.27.4 linux/arm64
+github.com/apache/arrow-go/v18 v18.8.0
+--- java
+openjdk version "21.0.12.1" 2026-08-18 LTS
+OpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)
+arrow-format-19.0.0.jar
+arrow-memory-core-19.0.0.jar
+arrow-memory-unsafe-19.0.0.jar
+arrow-vector-19.0.0.jar
+commons-codec-1.21.0.jar
+flatbuffers-java-25.2.10.jar
+jackson-annotations-2.21.jar
+jackson-core-2.21.0.jar
+jackson-databind-2.21.0.jar
+jackson-datatype-jsr310-2.21.0.jar
+slf4j-api-2.0.17.jar
+slf4j-nop-2.0.17.jar

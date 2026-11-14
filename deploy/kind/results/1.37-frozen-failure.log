@@ -1,0 +1,182 @@
+===== pods
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                         NOMINATED NODE   READINESS GATES
+frozen-cc6bc6459-h2m4n   1/2     Running   0          33m   10.244.0.27   scz-e2e-1-37-control-plane   <none>           <none>
+
+===== describe
+Name:             frozen-cc6bc6459-h2m4n
+Namespace:        frozen
+Priority:         0
+Service Account:  default
+Node:             scz-e2e-1-37-control-plane/172.21.0.2
+Start Time:       Sat, 14 Nov 2026 07:07:26 +0000
+Labels:           app=frozen
+                  pod-template-hash=cc6bc6459
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.27
+IPs:
+  IP:           10.244.0.27
+Controlled By:  ReplicaSet/frozen-cc6bc6459
+Init Containers:
+  sidecarzero:
+    Container ID:    containerd://038907c96fe911099ab26ad3bac81ba692d0460b18cfa8a64577e44df001fec1
+    Image:           sidecarzero-ort-fraud:dev
+    Image ID:        docker.io/library/import-2026-11-14@sha256:2848866d3ce811af5a824a8827109116eb6e7aa874baba5ec07a08ffd8926f46
+    Port:            9464/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Args:
+      --socket=/run/sidecarzero/scz.sock
+      --admin=/run/sidecarzero-admin/admin.sock
+      --http=0.0.0.0:9464
+      --model=/models/fraud.ort
+      --standby=warm
+      --rings=1
+      --ring-capacity=4096
+      --slots=1024
+      --slot-size=4096
+      --spin-us=50
+      --load-timeout-ms=300000
+      --max-deadline-ms=100
+      --rollback=true
+      --rollback-window-ms=60000
+      --fail-open=true
+      --oom-shield=auto
+      --session-grace-ms=20000
+      --pressure-shed=0.85
+      --pressure-recover=0.75
+      --pressure-hard=0.95
+      --pressure-shed-max-ms=2000
+    State:          Running
+      Started:      Sat, 14 Nov 2026 07:07:27 +0000
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      memory:  512Mi
+    Requests:
+      cpu:        1
+      memory:     512Mi
+    Liveness:     http-get http://:scz-http/livez delay=0s timeout=1s period=5s #success=1 #failure=3
+    Readiness:    http-get http://:scz-http/readyz delay=0s timeout=1s period=2s #success=1 #failure=3
+    Startup:      http-get http://:scz-http/startupz delay=0s timeout=1s period=1s #success=1 #failure=30
+    Environment:  <none>
+    Mounts:
+      /run/sidecarzero from scz-run (rw)
+      /run/sidecarzero-admin from scz-admin (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-tr58n (ro)
+Containers:
+  app:
+    Container ID:    containerd://53a1c6ec422b9927c38561332c745531628625f48b4eec012d180c954df7d495
+    Image:           scz-demo-host:dev
+    Image ID:        sha256:8a58e9364d4358e40705a199464d657958f0d498d54efceccbffe3e67631889a
+    Port:            8080/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Args:
+      --codec=features
+      --threads=2
+      --budget-us=2000
+      --interval-us=500
+      --http=0.0.0.0:8080
+    State:          Running
+      Started:      Sat, 14 Nov 2026 07:07:28 +0000
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      memory:  64Mi
+    Requests:
+      cpu:      200m
+      memory:   64Mi
+    Readiness:  http-get http://:http/healthz delay=0s timeout=1s period=1s #success=1 #failure=3
+    Environment:
+      SIDECARZERO_SOCKET:  /run/sidecarzero/scz.sock
+    Mounts:
+      /run/sidecarzero from scz-run (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-tr58n (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  scz-run:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  scz-admin:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-tr58n:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  33m                default-scheduler  Successfully assigned frozen/frozen-cc6bc6459-h2m4n to scz-e2e-1-37-control-plane
+  Normal   Pulled     33m                kubelet            Container image "sidecarzero-ort-fraud:dev" already present on machine and can be accessed by the pod
+  Normal   Created    33m                kubelet            Container created
+  Normal   Started    33m                kubelet            Container started
+  Normal   Pulled     33m                kubelet            Container image "scz-demo-host:dev" already present on machine and can be accessed by the pod
+  Normal   Created    33m                kubelet            Container created
+  Normal   Started    33m                kubelet            Container started
+  Warning  Unhealthy  32m (x3 over 32m)  kubelet            Liveness probe failed: Get "http://10.244.0.27:9464/livez": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+  Normal   Killing    32m                kubelet            Init container sidecarzero failed liveness probe
+  Warning  Unhealthy  32m (x7 over 32m)  kubelet            Readiness probe failed: Get "http://10.244.0.27:9464/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+
+===== frozen-cc6bc6459-h2m4n sidecarzero
+scz-supervisor: oom shield: none (memory.oom.group is 1; nestedCgroup is not available: /sys/fs/cgroup/scz-supervisor: Read-only file system (os error 30))
+scz-supervisor: memory monitor: /sys/fs/cgroup/: limit 512 MiB, PSI on
+scz-supervisor: arena 0x000016e4c7d47a3d: 8192 KiB data, 1 ring(s) of 4096, 1024 slot(s) of 4096 B
+scz-supervisor: listening on /run/sidecarzero/scz.sock, probes on 0.0.0.0:9464, admin on /run/sidecarzero-admin/admin.sock
+scz-supervisor: sandbox: seccomp on, landlock ABI 6, RLIMIT_DATA unset, RLIMIT_NOFILE 256, core dumps off
+scz-supervisor: model 1: /models/fraud.ort opened (3206224 bytes); hashing
+scz-supervisor: the model path names a new file (model 1)
+scz-supervisor: worker gen 1 spawned in beat slot 0
+scz-supervisor: model 1: sha256 fc1cfdd5394768023c3d9f933705c85234e41536d73f4b5af4bfcd7c5efb47ed
+scz-supervisor: worker gen 1 WARM after 107.2 ms
+scz-supervisor: worker gen 1: registry verified (1096 bytes, fingerprint 0x57078e8d7a2e3733)
+scz-supervisor: worker gen 1 activated
+scz-worker[12]: gen 1 active on 1 ring(s)
+scz-supervisor: worker gen 1 ACTIVE; gate HEALTHY
+scz-supervisor: worker gen 2 spawned in beat slot 1
+scz-supervisor: worker gen 2 WARM after 50.9 ms
+scz-supervisor: worker gen 2: registry verified (1096 bytes, fingerprint 0x57078e8d7a2e3733)
+scz-supervisor: session 1 offered to pid 1 (sdk RUST v256)
+scz-supervisor: session 1 bound
+
+===== frozen-cc6bc6459-h2m4n sidecarzero (previous)
+Error from server (BadRequest): previous terminated container "sidecarzero" in pod "frozen-cc6bc6459-h2m4n" not found
+
+===== frozen-cc6bc6459-h2m4n app
+scz-demo-host: 2 threads, budget 2ms, sidecar at /run/sidecarzero/scz.sock
+{"t_ms":1001,"calls":1165,"model":1160,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"DEADLINE":1}}
+{"t_ms":2001,"calls":2477,"model":2472,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"DEADLINE":1}}
+{"t_ms":3003,"calls":4026,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":558,"DEADLINE":3}}
+{"t_ms":4004,"calls":5853,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":2385,"DEADLINE":3}}
+{"t_ms":5005,"calls":7669,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":4201,"DEADLINE":3}}
+{"t_ms":6029,"calls":9083,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":5615,"DEADLINE":3}}
+{"t_ms":7031,"calls":10230,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":6762,"DEADLINE":3}}
+{"t_ms":8102,"calls":11439,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":7971,"DEADLINE":3}}
+{"t_ms":9327,"calls":11492,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":8024,"DEADLINE":3}}
+{"t_ms":10329,"calls":12975,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":9507,"DEADLINE":3}}
+{"t_ms":11330,"calls":14265,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":10797,"DEADLINE":3}}
+{"t_ms":12331,"calls":16039,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":12571,"DEADLINE":3}}
+{"t_ms":13331,"calls":17803,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":14335,"DEADLINE":3}}
+{"t_ms":14332,"calls":19654,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":16186,"DEADLINE":3}}
+{"t_ms":15334,"calls":21494,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":18026,"DEADLINE":3}}
+{"t_ms":16334,"calls":22863,"model":3461,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":4,"STALE_HEARTBEAT":19395,"DEADLINE":3}}
+
+===== frozen-cc6bc6459-h2m4n sczctl status
+sczctl: no reply
+command terminated with exit code 1
+

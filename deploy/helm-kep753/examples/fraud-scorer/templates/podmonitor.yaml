@@ -1,0 +1,1 @@
+{{- include "sidecarzero.podMonitor" (dict "root" . "selector" (dict "app" .Release.Name)) }}

@@ -1,0 +1,54 @@
+date (UTC): 2026-11-12T15:12:53Z
+uname -a  : Linux a2d4cf8c331d 6.12.76-linuxkit #1 SMP Fri May 29 10:00:01 UTC 2026 aarch64 GNU/Linux
+nproc     : 10
+page size : 4096
+MemTotal:        8126480 kB
+MemAvailable:    7179300 kB
+cgroup memory.max: 2147483648
+glibc     : ldd (Debian GLIBC 2.36-9+deb12u14) 2.36
+compiler  : g++ (Debian 12.2.0-14+deb12u1) 12.2.0
+jemalloc  : libjemalloc2 5.3.0-1 (/usr/lib/aarch64-linux-gnu/libjemalloc.so.2)
+ONNX Runtime C library: /opt/ort/lib/libonnxruntime.so.1.31.1
+  VERSION_NUMBER: 1.31.1   GIT_COMMIT_ID: 41d4d61f14b9c1dd0b2ccda1e9b85dd415fd0496
+  sha256 of the .so: 7e17c55d675be73f67a218dbecb55522395f61dafb3da03ebc7ade56a4c2f813
+python packages: numpy 2.3.4;onnx 1.23.2;onnxruntime 1.31.1;
+CPU (first core in /proc/cpuinfo):
+  Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp flagm2 frint i8mm bf16 bti afp ebf16
+  CPU implementer	: 0x61
+  CPU part	: 0x000
+S5_QUICK=0 (latency calls per run: 100000)
+
+models (generated at image build):
+  total 78164
+  -rw-r--r-- 1 root root     1340 Nov 12 11:50 gen.log
+  -rw-r--r-- 1 root root 37781950 Nov 12 11:50 mlp.onnx
+  -rw-r--r-- 1 root root 37785544 Nov 12 11:50 mlp.ort
+  -rw-r--r-- 1 root root      165 Nov 12 11:50 required_operators.config
+  -rw-r--r-- 1 root root  1243818 Nov 12 11:50 tree.onnx
+  -rw-r--r-- 1 root root  3206216 Nov 12 11:50 tree.ort
+  -rw-r--r-- 1 root root      631 Nov 12 11:50 tree1.onnx
+  -rw-r--r-- 1 root root     2480 Nov 12 11:50 tree1.ort
+
+model generation log:
+  side check, TreeEnsembleRegressor with n_targets=1 in onnxruntime 1.31.1
+    post_transform=NONE    : [-2.5742354 -0.9494371 -2.490074  -0.7617614]
+    post_transform=LOGISTIC: [-2.5742354 -0.9494371 -2.490074  -0.7617614]
+    identical: True (identical means LOGISTIC was NOT applied)
+  tree.onnx : 300 trees, depth 6, 38100 nodes
+  tree1.onnx: 1 tree, depth 1, 3 nodes (fixed-cost floor)
+  mlp.onnx  : 256-4096-2048-1, 9445377 parameters, 37.8 MB of float32
+  + /usr/local/bin/python -m onnxruntime.tools.convert_onnx_models_to_ort /work/models --optimization_style Fixed
+  2026-11-12 11:50:37,933 ort_format_model.utils [INFO] - Created config in /work/models/required_operators.config
+  Converting models with optimization style 'Fixed' and level 'all'
+  Converting optimized ONNX model /work/models/mlp.onnx to ORT format model /work/models/mlp.ort
+  Converting optimized ONNX model /work/models/tree1.onnx to ORT format model /work/models/tree1.ort
+  Converting optimized ONNX model /work/models/tree.onnx to ORT format model /work/models/tree.ort
+  Converted 3/3 models successfully.
+  Generating config file from ORT format models with optimization style 'Fixed' and level 'all'
+      37781950  mlp.onnx
+      37785544  mlp.ort
+           165  required_operators.config
+       1243818  tree.onnx
+       3206216  tree.ort
+           631  tree1.onnx
+          2480  tree1.ort

@@ -1,0 +1,107 @@
+# Defaults for the SidecarZero library chart (kubernetes-deploy §3, "Key values"). A chart that
+# depends on this one sets them under its own `sidecarzero:` key.
+
+sidecar:
+  # native: an init container with restartPolicy Always (KEP-753; Kubernetes 1.29 and later).
+  # classic: an ordinary container, without the start and stop ordering.
+  mode: native
+  name: sidecarzero
+
+image:
+  repository: sidecarzero-ort
+  tag: ""                      # defaults to the chart's appVersion
+  pullPolicy: IfNotPresent
+
+model:
+  path: /models/model.ort      # the file the supervisor serves, inside the sidecar container
+  sha256: ""                   # optional pin: a model with another digest is refused
+  # A volume source for the model directory, mounted read-only at mountPath: an image volume,
+  # a PVC, a ConfigMap, or an emptyDir an earlier init container fills. Empty: the model is
+  # baked into the sidecar image.
+  volume: {}
+  mountPath: /models
+  # ONNX Runtime images only: false turns weight prepacking off, so the weights stay shared
+  # between the worker and the standby instead of each holding a private copy, at a cost in
+  # speed for matrix models (worker §7.1).
+  prepack: true
+  # none: workers map the file from model.path. memfd: copy into a sealed memfd before launch.
+  copy: none
+
+arena:
+  small: { slots: 1024, slotSizeKi: 4 }
+  batch: { slots: 0, slotSizeKi: 128 }   # off by default; slots: 64 turns the batch class on
+  ringCapacity: 4096
+
+hugepages:
+  enabled: false               # attempt MFD_HUGETLB for the data arena, falling back if unavailable
+
+worker:
+  threads: 1                   # one ring and one consume thread each
+  standby: warm                # warm or none
+  spinMicros: 50               # the worker's spin budget; 0 always parks
+  loadTimeoutSeconds: 300
+  coreDumps: false
+  rlimitDataMi: 0              # 0: no RLIMIT_DATA on workers
+  maxDeadlineMillis: 100
+
+reload:
+  rollback: true
+  rollbackWindowSeconds: 60
+
+startup:
+  failOpen: true               # start degraded when the node cannot give the supervisor what it needs
+  waitForModel: false          # hold /startupz at 503 (--wait-for-model) until the model is HEALTHY
+
+oomShield:
+  mode: auto                   # auto, singleProcess, nestedCgroup, oomScoreAdj, none (kubernetes-deploy §5)
+  workerMemoryMaxMi: 0         # nestedCgroup: each worker's memory.max; 0 derives it from the limit
+
+shutdown:
+  sessionGraceSeconds: 20      # the pod's terminationGracePeriodSeconds must exceed it
+
+# The memory thresholds of supervisor §6, as fractions of the container's limit: relieve the
+# pressure at `shed` (retire the standby, or hand over to it), shed at once at `hard`, open the
+# gate again below `recover`; recycle the worker after shedding for shedMaxSeconds.
+pressure:
+  shed: 0.85
+  recover: 0.75
+  hard: 0.95
+  shedMaxSeconds: 2
+
+socket:
+  # path: a socket file in an emptyDir both containers mount. abstract: a name in the pod's
+  # network namespace, which needs no volume; never with hostNetwork: true, where every pod
+  # on the node could see it (kubernetes-deploy §7).
+  kind: path
+  dir: /run/sidecarzero
+  name: scz.sock
+adminDir: /run/sidecarzero-admin
+
+http:
+  port: 9464
+
+# Set the memory request equal to the limit (kubernetes-deploy §4). The default is the
+# "shared" CPU profile: a request and no CPU limit.
+resources:
+  requests: { cpu: "1", memory: 512Mi }
+  limits: { memory: 512Mi }
+
+# The sidecar container's securityContext. The default meets the `restricted` Pod Security
+# Standard. oomShield.mode=oomScoreAdj replaces it (root with SYS_RESOURCE; a privileged
+# namespace), and privileged=true is how nestedCgroup gets a writable cgroup where the cluster
+# offers no delegated one (spike S2).
+privileged: false
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities: { drop: ["ALL"] }
+  seccompProfile: { type: RuntimeDefault }
+
+extraArgs: []
+
+podMonitor:
+  enabled: false
+  interval: 15s

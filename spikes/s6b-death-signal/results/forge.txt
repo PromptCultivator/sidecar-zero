@@ -1,0 +1,5 @@
+supervisor C library: musl (static)
+forge: lock 0 reported owner-died 0.020 ms after the worker set the bit itself; word 0xc0000008
+forge: that consume thread's counter was 1005 at the report and 5249499 20 ms later: the thread is STILL RUNNING
+forge: kernel-visible check, tgkill(worker, tid of thread 0, 0) = 0 (0 means the thread exists)
+forge: VERDICT a worker CAN fake its own death

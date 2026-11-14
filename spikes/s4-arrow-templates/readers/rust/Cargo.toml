@@ -1,0 +1,17 @@
+[package]
+name = "s4-rust"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+arrow-array = "=60.1.0"
+arrow-buffer = "=60.1.0"
+arrow-data = "=60.1.0"
+arrow-ipc = "=60.1.0"
+arrow-schema = "=60.1.0"
+libc = "0.2"
+
+[profile.release]
+opt-level = 1
+debug = false

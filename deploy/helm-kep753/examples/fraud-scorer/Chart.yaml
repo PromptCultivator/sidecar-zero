@@ -1,0 +1,13 @@
+apiVersion: v2
+name: fraud-scorer
+description: >-
+  A complete example of a service with the SidecarZero sidecar: a Deployment and a Service whose
+  pods run a host application beside the sidecar, built from the library chart's named
+  templates (kubernetes-deploy §3). The deployment tests (deploy/kind) install it.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - name: sidecarzero
+    version: 0.1.0
+    repository: file://../..

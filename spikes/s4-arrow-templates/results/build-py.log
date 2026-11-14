@@ -1,0 +1,41 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 225B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 25.03kB 0.0s done
+#4 DONE 0.0s
+
+#5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#5 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
+#5 DONE 0.1s
+
+#6 [2/4] RUN pip install --no-cache-dir pyarrow==26.0.1
+#6 CACHED
+
+#7 [3/4] WORKDIR /s4/gen
+#7 CACHED
+
+#8 [4/4] COPY *.py /s4/gen/
+#8 DONE 0.0s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 0.1s done
+#9 exporting manifest sha256:a6f133366de89a27a4937c5430ccbaf21881475069241ca0f4ab68a7f708ffc3 0.0s done
+#9 exporting config sha256:c73df69563a5be51db970e3613ac9c0bd43bb85f85b019f91e306d952e935a8c 0.0s done
+#9 exporting attestation manifest sha256:9bf833541e1a106e9a92d942abe23a13b92ed6120ceec987788200f3be606cd1 0.1s done
+#9 exporting manifest list sha256:f716bde9d08429d1b777396cba2a971d750545a4fe4416cdfd2533b7b4fa4604
+#9 exporting manifest list sha256:f716bde9d08429d1b777396cba2a971d750545a4fe4416cdfd2533b7b4fa4604 0.0s done
+#9 naming to docker.io/library/scz-spike-s4-py:latest done
+#9 unpacking to docker.io/library/scz-spike-s4-py:latest 0.0s done
+#9 DONE 0.4s

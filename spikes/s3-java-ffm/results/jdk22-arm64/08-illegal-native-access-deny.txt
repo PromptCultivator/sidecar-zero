@@ -1,0 +1,5 @@
+$ java --illegal-native-access=deny -Ds3.out=/results/jdk22-arm64 -cp /spike/classes Probe /tmp/scz-s3.sock handshake
+Unrecognized option: --illegal-native-access=deny
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+[exit status 1]

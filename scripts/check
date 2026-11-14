@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Every check, in the order CI runs them. Needs only Docker.
+#
+#   scripts/check            generated files, golden arena, format, lints, tests (unit,
+#                            end-to-end, conformance scenarios, crash points), the chart, the
+#                            other SDKs (build, own tests, conformance suite), loom
+#   scripts/kind-e2e         the Kind deployment tests (separately: they need the Docker socket)
+#   scripts/upgrade-test     the suite between this ABI version and a next-minor build, both ways
+#                            (separately: it builds a second version of the sidecar)
+#   scripts/check --tla      also model-check both TLA+ specifications (spec/; many minutes)
+#   scripts/check --mutants  also show that every loom model and TLA+ property fails on its
+#                            seeded bug (slow; implies --tla)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+scripts/dev bash -c '
+set -euo pipefail
+step() { printf "\n== %s\n" "$1"; }
+# Print the summary lines; on a failure, the tail of the output, and fail.
+tests() {
+  local out
+  if ! out=$(cargo test -q --workspace "$@" 2>&1); then
+    printf "%s\n" "$out" | tail -120
+    return 1
+  fi
+  printf "%s\n" "$out" | grep -E "test result" | grep -v " 0 passed" || true
+}
+step "generated ABI files are current";  cargo run -q -p scz-abi-gen -- --check
+step "golden arena is current";          python3 abi/golden/generate.py --check
+# shm-abi §12.2: the beats and worker statistics on the status page are sidecar-internal, so
+# that a later sidecar can move them without a host ABI version. No SDK source may touch them.
+step "SDKs keep out of the sidecar-internal status fields"
+( hits=$(find sdks -type f \( -name "*.rs" -o -name "*.go" -o -name "*.java" -o -name "*.hpp" -o -name "*.cpp" -o -name "*.py" \) \
+      -not -path "*/target/*" -not -path "*/tests/*" -not -path "*/src/test/*" -not -name "*_test.go" \
+      -not -path "sdks/go/internal/abi/*" -not -name Abi.java -not -path "sdks/cpp20/include/scz/abi.hpp" -print0 \
+    | xargs -0 grep -nE "acc::(beat|worker_stats)::|::(beat|worker_stats)::|[.](Beat|WorkerStats)[A-Z][A-Za-z]*[(]|(^|[^A-Za-z])(Beat|WorkerStats)[.][a-z]" || true)
+  [ -z "$hits" ] || { printf "%s\n" "$hits"; exit 1; } )
+step "format";                           cargo fmt --all --check
+step "lints";                            cargo clippy -q --workspace --all-targets -- -D warnings
+# The end-to-end tests run the binaries of other packages, which `cargo test` does not build.
+step "fuzz targets compile";            CARGO_TARGET_DIR=target/fuzz cargo check -q --manifest-path fuzz/Cargo.toml
+# The chart (deploy/helm-kep753): lint, and render the example in each shape the Kind tests
+# install. The Kind tests themselves run with scripts/kind-e2e: they need the Docker socket.
+step "chart lints and renders"
+( C=deploy/helm-kep753/examples/fraud-scorer
+  helm dependency build "$C" >/dev/null && helm lint --quiet "$C" >/dev/null
+  for v in "" "--set sidecarzero.sidecar.mode=classic" "--set sidecarzero.oomShield.mode=oomScoreAdj" \
+           "--set sidecarzero.privileged=true --set sidecarzero.oomShield.mode=nestedCgroup" \
+           "--set sidecarzero.arena.batch.slots=64 --set sidecarzero.podMonitor.enabled=true" \
+           "--set sidecarzero.socket.kind=abstract --set sidecarzero.model.prepack=false"; do
+    helm template t "$C" $v >/dev/null || { echo "helm template $v failed"; exit 1; }
+  done
+  python3 -m py_compile deploy/kind/e2e.py ) 
+# The example alert rules and dashboard (kubernetes-deploy §9) may name only metrics that the
+# supervisor or the SDK export pass actually produces.
+step "monitoring examples name only exported metrics"
+python3 - <<"PY"
+import json, re, sys
+M = "deploy/helm-kep753/examples/monitoring"
+# A name is a whole token: "scz_client_*" in prose is not one. In the Rust sources they follow "\n".
+names = lambda text: {n for n in re.findall(r"scz_[a-z_]+", text) if not n.endswith("_")}
+rules = "".join(l for l in open(M + "/alerts.yaml") if not l.lstrip().startswith("#"))
+used = names(rules + json.dumps(json.load(open(M + "/dashboard.json"))))
+src = open("crates/scz-supervisor/src/http.rs").read() + open("sdks/rust/src/client.rs").read()
+made = names(src)
+made |= {m + s for m in made for s in ("_bucket", "_sum", "_count")}
+missing = sorted(used - made)
+if missing:
+    sys.exit("named but never exported: " + ", ".join(missing))
+print("  %d metrics, all exported" % len(used))
+PY
+step "tests (debug)";                    cargo build -q --workspace --bins && tests
+step "tests (release)";                  cargo build -q --workspace --bins --release && tests --release
+# The other SDKs (phase 4): each builds itself and its agent into target/sdk/<lang>, runs its
+# own tests (the allocation gate among them), and then passes the conformance suite against
+# the release binaries, with the crash-point builds the release tests made.
+for lang in java-ffm cpp20 go python; do
+  [ -x "sdks/$lang/build.sh" ] || continue
+  step "sdk $lang: build and tests"
+  out=$(sdks/$lang/build.sh 2>&1 && sdks/$lang/test.sh 2>&1) || { printf "%s\n" "$out" | tail -80; exit 1; }
+  printf "%s\n" "$out" | tail -5
+  agent=$(ls target/sdk/$lang/scz-agent-* | head -1)
+  # An SDK that builds its agent with crash points too runs the scenarios that crash the agent.
+  crash=$(ls target/sdk/$lang/crash/scz-agent-* 2>/dev/null | head -1 || true)
+  step "sdk $lang: conformance"
+  out=$(target/release/scz-conformance --bins=target/release --crash-bins=target/crash/release --agent="$agent" ${crash:+--crash-agent="$crash"} conformance/scenarios conformance/scenarios/crash 2>&1) \
+    || { printf "%s\n" "$out" | grep -v "^PASS" | tail -120; exit 1; }
+  printf "%s\n" "$out" | grep -E "^(SKIP|SUITE)|passed, " || true
+done
+'
+printf "\n== loom models\n"
+scripts/dev loom 2>&1 | grep -E "^test |test result"
+case " $* " in *" --tla "*|*" --mutants "*)
+  printf "\n== TLA+ specifications\n"
+  scripts/tla-check ;;
+esac
+case " $* " in *" --mutants "*)
+  printf "\n== loom mutants\n"
+  scripts/loom-mutants
+  printf "\n== TLA+ mutants\n"
+  scripts/tla-mutants ;;
+esac

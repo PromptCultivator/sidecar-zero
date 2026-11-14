@@ -1,0 +1,13 @@
+{{- $sz := .Values.sidecarzero -}}
+{{ .Release.Name }}: {{ .Values.replicas }} pod(s), each with the SidecarZero sidecar ({{ $sz.sidecar.mode }} mode, image {{ $sz.image.repository }}:{{ $sz.image.tag }}).
+
+Sidecar memory limit: {{ $sz.resources.limits.memory }}. It must hold the arena ({{ div (mul $sz.arena.small.slots $sz.arena.small.slotSizeKi) 1024 }} MiB of slots, plus rings and pages), the worker{{ if eq $sz.worker.standby "warm" }} twice (warm standby){{ end }}, the model's page cache, and headroom under the 85% shed threshold (kubernetes-deploy §4).
+OOM shield: {{ $sz.oomShield.mode }}. The mode in effect is in the sidecar's metrics as scz_oom_shield_mode.
+{{- if eq $sz.oomShield.mode "oomScoreAdj" }}
+WARNING: oomScoreAdj runs the supervisor as root with CAP_SYS_RESOURCE: the namespace must admit pods at the privileged Pod Security level, and the standby is not protected.
+{{- end }}
+{{- if $sz.privileged }}
+WARNING: the sidecar runs privileged, which only a privileged namespace admits.
+{{- end }}
+
+  kubectl exec deploy/{{ .Release.Name }} -c {{ $sz.sidecar.name }} -- sczctl --admin={{ $sz.adminDir }}/admin.sock status

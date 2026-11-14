@@ -1,0 +1,90 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk22-arm64 -cp /spike/classes -Djdk.virtualThreadScheduler.parallelism=1 -Djdk.virtualThreadScheduler.maxPoolSize=1 -XX:TieredStopAtLevel=1 S3 /tmp/scz-s3.sock alloc
+S3 spike: java.version=22.0.2 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=98
+modes=[alloc]
+
+[e] java.vm.version=22.0.2+9  vm args=[--enable-native-access=ALL-UNNAMED, -Ds3.out=/results/jdk22-arm64, -Djdk.virtualThreadScheduler.parallelism=1, -Djdk.virtualThreadScheduler.maxPoolSize=1, -XX:TieredStopAtLevel=1]
+[e] compiler: HotSpot 64-Bit Tiered Compilers   collectors: [G1 Young Generation, G1 Concurrent GC, G1 Old Generation]
+[e] thread allocated-bytes metering supported=true enabled=true
+
+[e] --- allocation on the call path, measured on a platform thread (getCurrentThreadAllocatedBytes); 1000000 iterations per round after 8 x 200000 warm-up ---
+[e] 0 empty loop (meter baseline)
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (0.8 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (0.8 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (0.8 ns/op, VM timing)
+[e] 1 core: nanoTime, 4 loads, CAS, plain/release/volatile stores
+[e]     cold first 2000 iterations: 7416 B total (3.7 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (32.0 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (32.4 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (31.5 ns/op, VM timing)
+[e] 2 core + futex WAKE downcall (no errno)
+[e]     cold first 2000 iterations: 85496 B total (42.7 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (314.3 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (196.0 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (193.9 ns/op, VM timing)
+[e] 3 core + timespec write + futex WAIT_BITSET downcall (returns EAGAIN at once)
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (298.6 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (233.5 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (224.3 ns/op, VM timing)
+[e] 4 core + futex WAKE downcall with captureCallState(errno)
+[e]     cold first 2000 iterations: 166056 B total (83.0 B/op)
+[e]     round 1: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (228.4 ns/op, VM timing)
+[e]     round 2: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (224.9 ns/op, VM timing)
+[e]     round 3: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (226.2 ns/op, VM timing)
+[e] 5 core + asSlice per call (design forbids this)
+[e]     cold first 2000 iterations: 80000 B total (40.0 B/op)
+[e]     round 1: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (42.8 ns/op, VM timing)
+[e]     round 2: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (43.2 ns/op, VM timing)
+[e]     round 3: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (40.1 ns/op, VM timing)
+[e] 6 positive control: boxed Long escapes each iteration
+[e]     cold first 2000 iterations: 48000 B total (24.0 B/op)
+[e]     round 1: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (8.9 ns/op, VM timing)
+[e]     round 2: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (8.1 ns/op, VM timing)
+[e]     round 3: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (16.9 ns/op, VM timing)
+[e] (blackhole 8783015124924405072)
+
+[e] virtual-thread run: 1 carrier thread(s) [ForkJoinPool-1-worker-1]; allocation read as the sum of the carriers' counters
+[e] inside virtual thread: isVirtual=true getCurrentThreadAllocatedBytes()=-1
+
+[e] --- allocation on the call path, measured on a virtual thread (sum over carriers); 1000000 iterations per round after 8 x 200000 warm-up ---
+[e] 0 empty loop (meter baseline)
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (1.7 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (1.3 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (1.3 ns/op, VM timing)
+[e] 1 core: nanoTime, 4 loads, CAS, plain/release/volatile stores
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (37.1 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (31.3 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (33.3 ns/op, VM timing)
+[e] 2 core + futex WAKE downcall (no errno)
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (186.6 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (185.7 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (188.9 ns/op, VM timing)
+[e] 3 core + timespec write + futex WAIT_BITSET downcall (returns EAGAIN at once)
+[e]     cold first 2000 iterations: 0 B total (0.0 B/op)
+[e]     round 1: 0 B allocated over 1000000 ops = 0.000000 B/op   (228.3 ns/op, VM timing)
+[e]     round 2: 0 B allocated over 1000000 ops = 0.000000 B/op   (227.1 ns/op, VM timing)
+[e]     round 3: 0 B allocated over 1000000 ops = 0.000000 B/op   (227.4 ns/op, VM timing)
+[e] 4 core + futex WAKE downcall with captureCallState(errno)
+[e]     cold first 2000 iterations: 80000 B total (40.0 B/op)
+[e]     round 1: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (232.3 ns/op, VM timing)
+[e]     round 2: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (276.0 ns/op, VM timing)
+[e]     round 3: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (234.9 ns/op, VM timing)
+[e] 5 core + asSlice per call (design forbids this)
+[e]     cold first 2000 iterations: 80000 B total (40.0 B/op)
+[e]     round 1: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (51.2 ns/op, VM timing)
+[e]     round 2: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (40.4 ns/op, VM timing)
+[e]     round 3: 40000000 B allocated over 1000000 ops = 40.000000 B/op   (39.8 ns/op, VM timing)
+[e] 6 positive control: boxed Long escapes each iteration
+[e]     cold first 2000 iterations: 48000 B total (24.0 B/op)
+[e]     round 1: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (14.1 ns/op, VM timing)
+[e]     round 2: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (11.3 ns/op, VM timing)
+[e]     round 3: 24000000 B allocated over 1000000 ops = 24.000000 B/op   (11.8 ns/op, VM timing)
+[e] (blackhole 8916493084879842192)
+[e] carriers after the virtual-thread run: 1
+
+S3 spike: modes [alloc] completed
+[exit status 0]

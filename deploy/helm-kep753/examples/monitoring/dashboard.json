@@ -1,0 +1,487 @@
+{
+  "title": "SidecarZero",
+  "uid": "sidecarzero",
+  "description": "The sidecar's /metrics and the host SDK's scz_client_* metrics (kubernetes-deploy \u00a79). An example to adapt.",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "tags": [
+    "sidecarzero"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus"
+      },
+      {
+        "name": "namespace",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "query": "label_values(scz_gate_state, namespace)",
+        "refresh": 2,
+        "includeAll": false,
+        "multi": false,
+        "allValue": null
+      },
+      {
+        "name": "pod",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "query": "label_values(scz_gate_state{namespace=\"$namespace\"}, pod)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "state-timeline",
+      "title": "Gate state",
+      "description": "The gate every call checks first (shm-abi \u00a73): anything but HEALTHY means calls fall back.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scz_gate_state{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "INIT",
+                  "color": "blue"
+                },
+                "1": {
+                  "text": "HEALTHY",
+                  "color": "green"
+                },
+                "2": {
+                  "text": "PSI_SHEDDING",
+                  "color": "orange"
+                },
+                "3": {
+                  "text": "RELOADING",
+                  "color": "yellow"
+                },
+                "4": {
+                  "text": "DEAD",
+                  "color": "red"
+                },
+                "5": {
+                  "text": "DRAINING",
+                  "color": "purple"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "Answered by the model",
+      "description": "From the host's SDK metrics (sdk-contract \u00a78).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (pod) (rate(scz_client_calls_total{namespace=\"$namespace\", pod=~\"$pod\", source=\"model\"}[$__rate_interval])) / sum by (pod) (rate(scz_client_calls_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 2
+    },
+    {
+      "type": "timeseries",
+      "title": "Fallbacks by reason",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (reason) (rate(scz_client_calls_total{namespace=\"$namespace\", pod=~\"$pod\", source=\"fallback\"}[$__rate_interval])) > 0",
+          "legendFormat": "{{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Call latency, model answers",
+      "description": "Sampled: one call in 64 per thread is timed.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(scz_client_latency_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\", source=\"model\"}[$__rate_interval])))",
+          "legendFormat": "p50"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(scz_client_latency_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\", source=\"model\"}[$__rate_interval])))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Time inside the fallback",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(scz_client_fallback_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])))",
+          "legendFormat": "p50"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(scz_client_fallback_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 5
+    },
+    {
+      "type": "timeseries",
+      "title": "Worker deaths, restarts, promotions",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(scz_worker_deaths_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "deaths"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(increase(scz_worker_restarts_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "cold restarts"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(increase(scz_standby_promotions_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "standby promotions"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(increase(scz_worker_condemned_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "condemned"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "id": 6
+    },
+    {
+      "type": "timeseries",
+      "title": "Last standby promotion",
+      "description": "From a death's first report to the standby being ACTIVE.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scz_promotion_seconds{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 7
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory utilization",
+      "description": "(memory.current - inactive_file) / memory.max; relief starts at 0.85 by default.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scz_memory_utilization_ratio{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "id": 8
+    },
+    {
+      "type": "timeseries",
+      "title": "Shedding and standby",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scz_shedding{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "shedding {{pod}}"
+        },
+        {
+          "refId": "B",
+          "expr": "scz_standby_suppressed{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "standby suppressed {{pod}}"
+        },
+        {
+          "refId": "C",
+          "expr": "1 - scz_model_fit{namespace=\"$namespace\", pod=~\"$pod\"}",
+          "legendFormat": "does not fit {{pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "id": 9
+    },
+    {
+      "type": "timeseries",
+      "title": "Reloads and rollbacks",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(scz_reloads_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "reloads"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (result) (increase(scz_handoffs_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "handoffs {{result}}"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(increase(scz_model_rollbacks_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "rollbacks"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(increase(scz_load_timeouts_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "load timeouts"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "id": 10
+    },
+    {
+      "type": "timeseries",
+      "title": "Session resets",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (cause) (increase(scz_session_resets_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "{{cause}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "id": 11
+    },
+    {
+      "type": "timeseries",
+      "title": "Callers shedding and late wake-ups",
+      "description": "Late wake-ups should be zero (signaling \u00a77).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 46,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(scz_client_breaker_open{namespace=\"$namespace\", pod=~\"$pod\"})",
+          "legendFormat": "breakers open"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(increase(scz_client_late_wakes_total{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]))",
+          "legendFormat": "late wake-ups"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "id": 12
+    }
+  ]
+}

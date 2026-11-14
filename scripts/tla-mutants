@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Show that each TLA+ property fails when the design step it guards is removed.
+
+    scripts/tla-mutants [NAME...]
+
+A property that holds whatever the protocol does proves nothing. Each row below switches on
+one seeded mistake (the specs' `Bug` constant) and checks only the property that mistake must
+break; TLC must report that property violated. Needs only Docker.
+"""
+import pathlib
+import re
+import subprocess
+import sys
+import tempfile
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+SPEC = ROOT / "spec"
+
+# (name, spec, base config, kind, property): the property TLC must report violated.
+MUTANTS = [
+    ("no_recheck",          "SlotsRing", "SlotsRing.cfg",              "INVARIANT", "NoLateQueued"),
+    ("sweep_before_gate",   "SlotsRing", "SlotsRing.cfg",              "INVARIANT", "NoLateQueued"),
+    ("no_done_wake",        "SlotsRing", "SlotsRing.cfg",              "INVARIANT", "ClientNotStranded"),
+    ("no_complete_wake",    "SlotsRing", "SlotsRing.cfg",              "INVARIANT", "ClientNotStranded"),
+    ("abandon_drops_owner", "SlotsRing", "SlotsRing.cfg",              "INVARIANT", "OwnerMeaningful"),
+    ("repair_equality",     "SlotsRing", "SlotsRing-full.cfg",         "INVARIANT", "RingUsable"),
+    ("ignore_markers",      "SlotsRing", "SlotsRing-session.cfg",      "INVARIANT", "NoResetUnderClient"),
+    ("void_no_wake",        "SlotsRing", "SlotsRing-session.cfg",      "INVARIANT", "ConsumerNotStranded"),
+    ("no_stuck_reset",      "SlotsRing", "SlotsRing-live-session.cfg", "PROPERTY",  "StuckHeadClears"),
+    ("fail_owned_on_lock",  "Consumers", "Consumers-crash.cfg",        "INVARIANT", "OneWriter"),
+    ("promote_on_kill",     "Consumers", "Consumers-crash.cfg",        "INVARIANT", "OneConsumer"),
+    ("store_healthy",       "Consumers", "Consumers-crash.cfg",        "INVARIANT", "HealthyOnlyWhenOpen"),
+    ("handover_no_release", "Consumers", "Consumers-same.cfg",         "INVARIANT", "OneConsumer"),
+]
+
+
+def config(base: str, bug: str, kind: str, prop: str) -> str:
+    """The base configuration with Bug set and only the one property left to check."""
+    out = []
+    for line in (SPEC / base).read_text().splitlines():
+        if line.strip() in ("INVARIANTS", "PROPERTIES"):
+            break
+        out.append(re.sub(r'Bug = "[^"]*"', f'Bug = "{bug}"', line))
+    out += [f"{kind} {prop}", "CHECK_DEADLOCK FALSE", ""]
+    return "\n".join(out)
+
+
+def main() -> int:
+    wanted = set(sys.argv[1:])
+    missed = 0
+    for name, spec, base, kind, prop in MUTANTS:
+        if wanted and name not in wanted:
+            continue
+        with tempfile.NamedTemporaryFile("w", suffix=".cfg", dir=SPEC, prefix=f".mutant-{name}-", delete=False) as f:
+            f.write(config(base, name, kind, prop))
+            cfg = pathlib.Path(f.name)
+        try:
+            r = subprocess.run([str(ROOT / "scripts/tlc"), f"spec/{spec}.tla", f"spec/{cfg.name}"],
+                               cwd=ROOT, capture_output=True, text=True)
+            out = r.stdout + r.stderr
+        finally:
+            cfg.unlink(missing_ok=True)
+        hit = (f"Invariant {prop} is violated" in out) if kind == "INVARIANT" else ("Temporal properties were violated" in out)
+        steps = re.findall(r"^State (\d+):", out, re.M)
+        detail = f"{len(steps)}-state trace" if steps else "no trace"
+        if hit:
+            print(f"caught: {name:<20} {prop} violated ({detail})")
+        else:
+            missed += 1
+            tail = "\n".join(l for l in out.splitlines() if "rror" in l or "violated" in l or "completed" in l)
+            print(f"MISSED: {name:<20} {prop} held\n{tail}")
+    return 1 if missed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

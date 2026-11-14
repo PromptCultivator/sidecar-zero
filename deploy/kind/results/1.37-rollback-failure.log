@@ -1,0 +1,206 @@
+===== pods
+NAME                        READY   STATUS    RESTARTS   AGE   IP            NODE                         NOMINATED NODE   READINESS GATES
+rollback-74dd4f9cbb-kfnjf   2/2     Running   0          27m   10.244.0.28   scz-e2e-1-37-control-plane   <none>           <none>
+
+===== describe
+Name:             rollback-74dd4f9cbb-kfnjf
+Namespace:        rollback
+Priority:         0
+Service Account:  default
+Node:             scz-e2e-1-37-control-plane/172.21.0.2
+Start Time:       Sat, 14 Nov 2026 07:40:33 +0000
+Labels:           app=rollback
+                  pod-template-hash=74dd4f9cbb
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.28
+IPs:
+  IP:           10.244.0.28
+Controlled By:  ReplicaSet/rollback-74dd4f9cbb
+Init Containers:
+  sidecarzero:
+    Container ID:    containerd://b9168971b8d587f583e45e5dce16997e9d30e944fb7ca6b0bf2127c23eb24642
+    Image:           sidecarzero-chaos:dev
+    Image ID:        sha256:40907de013e76bbfd73256b336a01ea22b0b956b2c3dd0cf2a01ca19553c1fe5
+    Port:            9464/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Args:
+      --socket=/run/sidecarzero/scz.sock
+      --admin=/run/sidecarzero-admin/admin.sock
+      --http=0.0.0.0:9464
+      --model=/models/model
+      --standby=warm
+      --rings=1
+      --ring-capacity=4096
+      --slots=1024
+      --slot-size=4096
+      --spin-us=50
+      --load-timeout-ms=300000
+      --max-deadline-ms=100
+      --rollback=true
+      --rollback-window-ms=60000
+      --fail-open=true
+      --oom-shield=auto
+      --session-grace-ms=20000
+      --pressure-shed=0.85
+      --pressure-recover=0.75
+      --pressure-hard=0.95
+      --pressure-shed-max-ms=2000
+    State:          Running
+      Started:      Sat, 14 Nov 2026 07:40:33 +0000
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      memory:  512Mi
+    Requests:
+      cpu:        1
+      memory:     512Mi
+    Liveness:     http-get http://:scz-http/livez delay=0s timeout=1s period=5s #success=1 #failure=3
+    Readiness:    http-get http://:scz-http/readyz delay=0s timeout=1s period=2s #success=1 #failure=3
+    Startup:      http-get http://:scz-http/startupz delay=0s timeout=1s period=1s #success=1 #failure=30
+    Environment:  <none>
+    Mounts:
+      /models from scz-models (ro)
+      /run/sidecarzero from scz-run (rw)
+      /run/sidecarzero-admin from scz-admin (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-gxxf2 (ro)
+Containers:
+  app:
+    Container ID:    containerd://ace93ed2901ebbe23ee566785aee7f66b05b5ae261e886cfd821b1db1df3a89f
+    Image:           scz-demo-host:dev
+    Image ID:        sha256:8a58e9364d4358e40705a199464d657958f0d498d54efceccbffe3e67631889a
+    Port:            8080/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Args:
+      --codec=keyed
+      --threads=2
+      --budget-us=2000
+      --interval-us=500
+      --http=0.0.0.0:8080
+    State:          Running
+      Started:      Sat, 14 Nov 2026 07:40:34 +0000
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      memory:  64Mi
+    Requests:
+      cpu:      200m
+      memory:   64Mi
+    Readiness:  http-get http://:http/healthz delay=0s timeout=1s period=1s #success=1 #failure=3
+    Environment:
+      SIDECARZERO_SOCKET:  /run/sidecarzero/scz.sock
+    Mounts:
+      /run/sidecarzero from scz-run (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-gxxf2 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  scz-run:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  scz-admin:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  scz-models:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      rollback-model
+    Optional:  false
+  kube-api-access-gxxf2:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  27m   default-scheduler  Successfully assigned rollback/rollback-74dd4f9cbb-kfnjf to scz-e2e-1-37-control-plane
+  Normal  Pulled     27m   kubelet            Container image "sidecarzero-chaos:dev" already present on machine and can be accessed by the pod
+  Normal  Created    27m   kubelet            Container created
+  Normal  Started    27m   kubelet            Container started
+  Normal  Pulled     27m   kubelet            Container image "scz-demo-host:dev" already present on machine and can be accessed by the pod
+  Normal  Created    27m   kubelet            Container created
+  Normal  Started    27m   kubelet            Container started
+
+===== rollback-74dd4f9cbb-kfnjf sidecarzero
+scz-supervisor: oom shield: none (memory.oom.group is 1; nestedCgroup is not available: /sys/fs/cgroup/scz-supervisor: Read-only file system (os error 30))
+scz-supervisor: memory monitor: /sys/fs/cgroup/: limit 512 MiB, PSI on
+scz-supervisor: arena 0x000016e9b0079351: 8192 KiB data, 1 ring(s) of 4096, 1024 slot(s) of 4096 B
+scz-supervisor: listening on /run/sidecarzero/scz.sock, probes on 0.0.0.0:9464, admin on /run/sidecarzero-admin/admin.sock
+scz-supervisor: sandbox: seccomp on, landlock ABI 6, RLIMIT_DATA unset, RLIMIT_NOFILE 256, core dumps off
+scz-supervisor: model 1: /models/model opened (27 bytes); hashing
+scz-supervisor: the model path names a new file (model 1)
+scz-supervisor: model 1: sha256 8ab565cd35c29bf08bdb6f6011ca89918af42139a8b599d9cad49e2272da38ff
+scz-supervisor: worker gen 1 spawned in beat slot 0
+scz-supervisor: worker gen 1 WARM after 6.6 ms
+scz-supervisor: worker gen 1: registry verified (0 bytes, fingerprint 0x0000000000000000)
+scz-supervisor: worker gen 1 activated
+scz-supervisor: worker gen 1 ACTIVE; gate HEALTHY
+scz-worker[12]: gen 1 active on 1 ring(s)
+scz-supervisor: worker gen 2 spawned in beat slot 1
+scz-supervisor: worker gen 2 WARM after 1.2 ms
+scz-supervisor: worker gen 2: registry verified (0 bytes, fingerprint 0x0000000000000000)
+scz-supervisor: session 1 offered to pid 1 (sdk RUST v256)
+scz-supervisor: session 1 bound
+scz-supervisor: worker gen 1 condemned: heartbeat stale
+scz-supervisor: death lock of gen 1 ring 0 reported
+scz-supervisor: worker gen 1 died as the consumer; gate closed; 0 queued request(s) failed, 0 answered woken
+scz-supervisor: worker gen 2 activated
+scz-supervisor: gate reopened 2.42 ms after the death was reported
+scz-supervisor: worker gen 2 ACTIVE; gate HEALTHY
+scz-worker[16]: gen 2 active on 1 ring(s)
+scz-supervisor: worker gen 1 killed by signal 9
+scz-supervisor: worker gen 1 exited and was reaped; beat slot 0 is free
+scz-supervisor: worker gen 3 spawned in beat slot 0
+scz-supervisor: worker gen 3 WARM after 2.4 ms
+scz-supervisor: worker gen 3: registry verified (0 bytes, fingerprint 0x0000000000000000)
+
+===== rollback-74dd4f9cbb-kfnjf sidecarzero (previous)
+Error from server (BadRequest): previous terminated container "sidecarzero" in pod "rollback-74dd4f9cbb-kfnjf" not found
+
+===== rollback-74dd4f9cbb-kfnjf app
+scz-demo-host: 2 threads, budget 2ms, sidecar at /run/sidecarzero/scz.sock
+{"t_ms":1000,"calls":1245,"model":1234,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":2,"DEADLINE":7}}
+{"t_ms":2000,"calls":3091,"model":3080,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":2,"DEADLINE":7}}
+{"t_ms":3001,"calls":4877,"model":4866,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":2,"DEADLINE":7}}
+{"t_ms":4002,"calls":6366,"model":6355,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":2,"DEADLINE":7}}
+{"t_ms":5003,"calls":7910,"model":7899,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":2,"DEADLINE":7}}
+{"t_ms":6004,"calls":8999,"model":8980,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":4,"DEADLINE":13}}
+{"t_ms":7005,"calls":10562,"model":10543,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":4,"DEADLINE":13}}
+{"t_ms":8006,"calls":11938,"model":11918,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":9007,"calls":13537,"model":13517,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":10008,"calls":14923,"model":14903,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":11010,"calls":16479,"model":16459,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":12010,"calls":17877,"model":17857,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":13011,"calls":19442,"model":19422,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":14012,"calls":20933,"model":20913,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":13}}
+{"t_ms":15012,"calls":22454,"model":22433,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":14}}
+{"t_ms":16013,"calls":24002,"model":23980,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":15}}
+{"t_ms":17014,"calls":25560,"model":25538,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":15}}
+{"t_ms":18015,"calls":27103,"model":27081,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"STALE_HEARTBEAT":5,"DEADLINE":15}}
+{"t_ms":19016,"calls":28531,"model":28499,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":20017,"calls":30100,"model":30068,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":21018,"calls":31512,"model":31480,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":22019,"calls":33133,"model":33101,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":23020,"calls":34697,"model":34665,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":24021,"calls":36325,"model":36293,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":25022,"calls":38019,"model":37987,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":26024,"calls":39687,"model":39655,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+{"t_ms":27025,"calls":41228,"model":41196,"wrong":0,"late":0,"fallback":{"NOT_CONNECTED":2,"GATE_DEAD":9,"STALE_HEARTBEAT":5,"DEADLINE":16}}
+
+===== rollback-74dd4f9cbb-kfnjf sczctl status
+{"state":"HEALTHY","reason":"NONE","gen":2,"consumer":2,"holds":[],"workers":[{"gen":2,"beat":1,"role":"Consumer","active":true,"dying":false,"condemned":false,"retired":false},{"gen":3,"beat":0,"role":"Warm","active":false,"dying":false,"condemned":false,"retired":false}],"spawns":3,"deaths":1,"promotions":1,"restarts":0,"resets":0,"reloads":0,"condemned":1,"recycles":0,"retired_standbys":0,"refusal_condemns":0,"last_recovery_ms":2.421,"max_recovery_ms":2.421,"last_promotion_ms":2.421,"max_promotion_ms":2.421,"crashloop":false,"shedding":false,"standby_suppressed":false,"does_not_fit":false,"reset_stuck":false,"session_bound":true,"accepting":false,"util":0.027,"ring_depth":[0],"slots":{"FREE":1024,"CLAIMED":0,"READY":0,"PROCESSING":0,"DONE":0,"FAILED":0,"ABANDONED":0},"transitions":[{"state":"INIT","reason":"NO_MODEL","gen":0,"at_ns":26292449280797},{"state":"INIT","reason":"NO_MODEL","gen":1,"at_ns":26292456588089},{"state":"HEALTHY","reason":"NONE","gen":1,"at_ns":26292456816214},{"state":"DEAD","reason":"WORKER_HUNG","gen":1,"at_ns":26311997454931},{"state":"DEAD","reason":"WORKER_EXIT","gen":1,"at_ns":26312014721223},{"state":"DEAD","reason":"WORKER_EXIT","gen":2,"at_ns":26312014721223},{"state":"HEALTHY","reason":"NONE","gen":2,"at_ns":26312017142181}],"last_cause":"heartbeat stale","registry_epoch":1,"rollbacks":0,"rejected":0,"target_model":1,"schema_fingerprint":"0x0000000000000000","model_sha256":"8ab565cd35c29bf08bdb6f6011ca89918af42139a8b599d9cad49e2272da38ff","previous_model":null,"trial_served_ms":0,"trial_deaths":0,"model":1}
+

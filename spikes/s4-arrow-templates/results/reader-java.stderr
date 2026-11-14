@@ -1,0 +1,28 @@
+arrow-java 19.0.0 (arrow-vector, arrow-memory-unsafe); java 21.0.12.1+1-LTS; BoundsChecking.BOUNDS_CHECKING_ENABLED=true; NullCheckingForGet.NULL_CHECKING_ENABLED=true
+[launch.r17.x-buffer-past-body / deserializeRecordBatch] java.lang.IndexOutOfBoundsException: index (36864) must not be greater than size (32768)
+	at org.apache.arrow.util.Preconditions.checkPositionIndex(Preconditions.java:1128)
+	at org.apache.arrow.util.Preconditions.checkPositionIndex(Preconditions.java:1111)
+	at org.apache.arrow.memory.ArrowBuf.slice(ArrowBuf.java:186)
+	at org.apache.arrow.vector.ipc.message.MessageSerializer.deserializeRecordBatch(MessageSerializer.java:429)
+	at org.apache.arrow.vector.ipc.message.MessageSerializer.deserializeRecordBatch(MessageSerializer.java:343)
+	at s4.Reader.modeDeserialize(Reader.java:280)
+	at s4.Reader.lambda$main$0(Reader.java:343)
+	at s4.Reader.report(Reader.java:213)
+	at s4.Reader.main(Reader.java:343)
+
+[launch.r17.x-buffer-past-body / ArrowStreamReader] s4.Reader$Failure: java.lang.IndexOutOfBoundsException: index (36864) must not be greater than size (32768) [closing the reader's allocator then failed: Memory was leaked by query. Memory leaked: (32768)]
+	at s4.Reader.modeStream(Reader.java:321)
+	at s4.Reader.lambda$main$1(Reader.java:344)
+	at s4.Reader.report(Reader.java:213)
+	at s4.Reader.main(Reader.java:344)
+Caused by: java.lang.IndexOutOfBoundsException: index (36864) must not be greater than size (32768)
+	at org.apache.arrow.util.Preconditions.checkPositionIndex(Preconditions.java:1128)
+	at org.apache.arrow.util.Preconditions.checkPositionIndex(Preconditions.java:1111)
+	at org.apache.arrow.memory.ArrowBuf.slice(ArrowBuf.java:186)
+	at org.apache.arrow.vector.ipc.message.MessageSerializer.deserializeRecordBatch(MessageSerializer.java:429)
+	at org.apache.arrow.vector.ipc.message.MessageSerializer.deserializeRecordBatch(MessageSerializer.java:343)
+	at org.apache.arrow.vector.ipc.ArrowStreamReader.loadNextBatch(ArrowStreamReader.java:160)
+	at s4.Reader.modeStream(Reader.java:308)
+	... 3 more
+
+root allocator: Memory was leaked by query. Memory leaked: (32768)

@@ -1,0 +1,6 @@
+host: Docker Desktop, kernel 6.12.76-linuxkit, aarch64, 10 CPUs
+16 watchers, 20 kill pairs
+  active worker, 8 running consume threads:  first lock  0.064/ 0.076/  0.095   last of 8  0.162/ 0.243/  0.711   pidfd  0.299/ 0.480/  0.562 ms
+  standby, 8 parked consume threads:         last of 8 after its own kill  0.168/ 0.262/  4.476 ms
+  standby locks that reported while only the active worker was killed: 0
+  consume threads that ran after their own report: 0

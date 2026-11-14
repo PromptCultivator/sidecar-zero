@@ -1,0 +1,23 @@
+restarts: 0   last exit: 
+--- what the first container instance printed
+supervisor: pid 1 uid 0, effective capabilities 000001ffffffffff
+  our cgroup                         /sys/fs/cgroup/kubelet.slice/kubelet-kubepods.slice/kubelet-kubepods-burstable.slice/kubelet-kubepods-burstable-pod1dc7758b_e630_47a2_ad55_7fb6216d28bf.slice/cri-containerd-adc18ab3c4c8ea363ffc817cbb27233619b9132b09cf6d8f35a539fe50c8eb09.scope
+  memory.max                         100663296 
+  memory.oom.group                   1 
+  our oom_score_adj                  988 
+SHIELD nestedCgroup: mkdir child cgroups -> 0 0 0 (0 is success; negative is -errno)
+SHIELD nestedCgroup: move ourselves into the child cgroup -> 0
+  processes left in the container cgroup 
+  controllers available to it        cpuset cpu io memory hugetlb pids rdma 
+SHIELD nestedCgroup: enable memory for children -> 0, worker limit 56 MiB -> 0
+SHIELD nestedCgroup: in effect
+round 1: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 35 oom 1 oom_kill 1 oom_group_kill 0 
+  worker cgroup memory.events        low 0 high 0 max 35 oom 1 oom_kill 1 oom_group_kill 0 
+round 2: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+  worker cgroup memory.events        low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+round 3: worker ended by signal 9; supervisor alive; standby alive
+  container memory.events            low 0 high 0 max 105 oom 3 oom_kill 3 oom_group_kill 0 
+  worker cgroup memory.events        low 0 high 0 max 105 oom 3 oom_kill 3 oom_group_kill 0 
+RESULT supervisor survived 3 worker OOMs; standby survived

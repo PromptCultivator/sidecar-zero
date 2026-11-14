@@ -1,0 +1,86 @@
+# Continuous integration: the same scripts a developer runs, on both architectures the sidecar
+# supports (kubernetes-deploy §2). Everything runs in the pinned dev image (scripts/dev), so a
+# runner needs only Docker.
+#
+#   check         scripts/check: generated files, format, lints, every test, the chart and the
+#                 monitoring examples, the other SDKs with the conformance suite, loom
+#   upgrade       scripts/upgrade-test: the suite between this ABI minor and the next, both ways
+#   kind          scripts/kind-e2e: the deployment tests in Kind, on the default Kubernetes
+#   bench-smoke   the benchmark at its smallest, so that bench/ keeps working; its numbers
+#                 mean nothing on a shared runner (bench §6)
+#
+# The performance gates and the publishable benchmark need the quiet bare-metal machines of
+# testing §7, not these runners.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_BUILD_JOBS: "4"
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the dev image
+        uses: ./.github/actions/dev-image
+      - name: scripts/check
+        run: scripts/check
+
+  upgrade:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/dev-image
+      - name: scripts/upgrade-test
+        run: scripts/upgrade-test
+
+  kind:
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/dev-image
+      - name: scripts/kind-e2e
+        run: scripts/kind-e2e
+
+  bench-smoke:
+    needs: check
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/dev-image
+      - name: The benchmark, in-process, sidecar and Unix-socket baseline, two scenarios
+        run: scripts/bench --quick --modes=inproc --systems=A,E --scenarios=steady,kill --kills=3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-smoke
+          path: bench/results/
+          if-no-files-found: ignore

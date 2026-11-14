@@ -1,0 +1,16 @@
+restarts: 0   last exit: 
+--- what the first container instance printed
+supervisor: pid 1 uid 0, effective capabilities 0000000001000000
+  our cgroup                         /sys/fs/cgroup
+  memory.max                         100663296 
+  memory.oom.group                   1 
+  our oom_score_adj                  988 
+SHIELD oomScoreAdj: writing -1000 succeeded (errno 0)
+  our oom_score_adj now              -1000 
+round 1: worker ended by signal 9; supervisor alive; standby KILLED
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 3 oom_group_kill 1 
+round 2: worker ended by signal 9; supervisor alive; standby KILLED
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 5 oom_group_kill 2 
+round 3: worker ended by signal 9; supervisor alive; standby KILLED
+  container memory.events            low 0 high 0 max 0 oom 0 oom_kill 7 oom_group_kill 3 
+RESULT supervisor survived 3 worker OOMs; standby was killed

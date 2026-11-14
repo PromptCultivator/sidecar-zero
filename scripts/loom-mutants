@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Show that each loom model fails when the protocol step it guards is removed.
+
+    scripts/loom-mutants
+
+A model that passes whatever the code does proves nothing. Each mutant below deletes one
+step (a wake, a re-check, a fence); its model must then fail, by assertion or by loom's
+deadlock detection. Sources are restored afterwards and touched, so that cargo rebuilds
+from them: restoring an older copy would leave the mutated build looking fresh.
+"""
+import os, subprocess, sys, pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+MUTANTS = [
+    ("crates/scz-shm/src/slot.rs", "client_park_and_worker_complete",
+     "            if wake {\n                s.wake();\n            }\n            true",
+     "            true"),
+    ("crates/scz-shm/src/snapshot.rs", "a_snapshot_is_never_freed_under_a_call",
+     "            if p.current.load(SeqCst) != id {", "            if false && p.current.load(SeqCst) != id {"),
+    ("crates/scz-shm/src/ring.rs", "ring_two_producers_one_parking_consumer",
+     "    if head_published(r, head) || pending() {", "    if pending() {"),
+    ("crates/scz-shm/src/standby.rs", "standby_wait_with_two_waiters",
+     "        let v = m.standby_wait().load(Acquire); // before the gate\n        if gate_gen(m.gate().load(Acquire)) == gen {\n            return;\n        }",
+     "        if gate_gen(m.gate().load(Acquire)) == gen {\n            return;\n        }\n        let v = m.standby_wait().load(Acquire);"),
+    ("crates/scz-shm/src/slot.rs", "a_worker_that_dies_before_waking_is_covered_by_the_sweep",
+     "    if state(s.word().load(Acquire)) == ss::DONE {\n        s.wake();\n        true",
+     "    if state(s.word().load(Acquire)) == ss::DONE {\n        true"),
+    ("crates/scz-shm/tests/loom.rs", "gate_recheck_against_the_sweep",
+     "            g2.store(gate(1, 1, gs::DEAD), Release);\n            full_fence();",
+     "            g2.store(gate(1, 1, gs::DEAD), Release);"),
+]
+
+missed = 0
+for rel, test, old, new in MUTANTS:
+    path = ROOT / rel
+    src = path.read_text()
+    if src.count(old) != 1:
+        sys.exit(f"{rel}: the text to mutate is not there exactly once; update this script")
+    try:
+        path.write_text(src.replace(old, new))
+        r = subprocess.run([str(ROOT / "scripts/dev"), "loom", test], capture_output=True, text=True)
+        out = r.stdout + r.stderr
+        why = "deadlock" if "deadlock" in out else ("crash" if "signal:" in out else "assertion")
+        print(f"{'caught' if r.returncode else 'MISSED'}: {test} ({why if r.returncode else 'model passed'})")
+        missed += r.returncode == 0
+    finally:
+        path.write_text(src)
+        os.utime(path)
+for rel in {m[0] for m in MUTANTS}:
+    os.utime(ROOT / rel)
+sys.exit(1 if missed else 0)

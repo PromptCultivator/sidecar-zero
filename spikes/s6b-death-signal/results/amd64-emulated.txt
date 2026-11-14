@@ -1,0 +1,26 @@
+host: Docker Desktop, kernel 6.12.76-linuxkit, aarch64, 10 CPUs
+linux/amd64 containers on this host run under emulation, on the host's own arm64 kernel.
+x86_64
+  one kill in detail (0 MiB):
+    lock 0 (tid 10): reported 0.064 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 1 (tid 11): reported 0.711 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 2 (tid 12): reported 0.077 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    lock 3 (tid 13): reported 0.689 ms after the kill, word 0xc0000000, its counter afterwards unchanged
+    pidfd readable 18446731106826.395 ms after the kill; runtime threads took 0 more steps after the first report
+supervisor C library: musl (static); worker C library: glibc 2.41; 4 consume threads with a lock each, 2 runtime threads without
+
+All times in ms after the kill; 5 kills per row; median / p90 / max
+worker     first lock reports       last lock reports        pidfd readable           checks
+    0 MiB   0.000/ 0.000/  0.000    0.000/ 0.000/  0.000    0.000/ 0.000/  0.000   consume thread ran after its own report: 0; runtime threads ran after the first report in 0 of 0 kills (up to 0 steps); SOME KILLS FAILED THEIR CHECKS
+  512 MiB   0.000/ 0.000/  0.000    0.000/ 0.000/  0.000    0.000/ 0.000/  0.000   consume thread ran after its own report: 0; runtime threads ran after the first report in 0 of 0 kills (up to 0 steps); SOME KILLS FAILED THEIR CHECKS
+supervisor C library: musl (static)
+forge: lock 0 reported owner-died 0.207 ms after the worker set the bit itself; word 0xc0000084
+forge: that consume thread's counter was 13620 at the report and 10697545 20 ms later: the thread is STILL RUNNING
+forge: kernel-visible check, tgkill(worker, tid of thread 0, 0) = 0 (0 means the thread exists)
+forge: VERDICT a worker CAN fake its own death
+segv-consume       0 MiB  none                    none                    none                    worker ended by signal 11; first report from lock 0 in 0 of 0; consume thread ran after its report: 0; runtime threads ran after the first report in 0; SOME RUNS INCOMPLETE
+16 watchers, 0 kill pairs
+  active worker, 8 running consume threads:  first lock none                     last of 8 none                     pidfd none                   ms
+  standby, 8 parked consume threads:         last of 8 after its own kill none                   ms
+  standby locks that reported while only the active worker was killed: 0
+  consume threads that ran after their own report: 0; SOME RUNS INCOMPLETE

@@ -1,0 +1,16 @@
+host: Docker Desktop, kernel 6.12.76-linuxkit, aarch64, 10 CPUs
+Times in ms from the moment the supervisor asks for the crash (or sends SIGKILL); median / p90 / max; 20 runs per row
+Core dumps off (ulimit -c 0), as the deployment should run
+how            worker    first lock reports      last of 4 reports       pidfd readable        
+kill               0 MiB   0.058/ 0.089/  2.164   0.102/ 1.369/  2.248   0.188/ 0.265/  2.312  worker ended by signal 9; first report from lock 0 in 4 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+kill             512 MiB   0.058/ 0.086/  0.090   0.111/ 0.578/  0.589   0.659/ 1.140/  1.447  worker ended by signal 9; first report from lock 0 in 8 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+kill            2048 MiB   0.081/ 0.535/  0.886   0.137/ 1.734/  1.815  26.180/47.601/ 60.688  worker ended by signal 9; first report from lock 0 in 4 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-consume       0 MiB   0.115/ 0.142/  0.169   0.159/ 0.212/  0.224   0.242/ 0.327/  0.358  worker ended by signal 11; first report from lock 0 in 10 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-consume     512 MiB   0.238/ 1.702/  2.769   0.320/ 1.860/  2.822   1.135/ 4.311/  7.460  worker ended by signal 11; first report from lock 0 in 11 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-consume    2048 MiB   0.125/ 0.171/  0.316   0.165/ 0.622/  1.805  26.329/37.520/ 37.734  worker ended by signal 11; first report from lock 0 in 8 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-runtime       0 MiB   0.116/ 0.151/  0.174   0.164/ 0.222/  0.489   0.239/ 0.370/  0.381  worker ended by signal 11; first report from lock 0 in 3 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-runtime     512 MiB   0.111/ 0.195/  1.324   0.141/ 0.287/  1.355   0.739/ 2.013/  2.532  worker ended by signal 11; first report from lock 0 in 5 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+segv-runtime    2048 MiB   0.119/ 0.184/  0.678   0.163/ 0.228/  0.733  27.074/33.018/ 35.945  worker ended by signal 11; first report from lock 0 in 3 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+abort-consume      0 MiB   0.111/ 0.171/  0.355   0.148/ 0.203/  0.517   0.235/ 0.317/  0.537  worker ended by signal 6; first report from lock 0 in 12 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+abort-consume    512 MiB   0.117/ 0.151/  0.157   0.158/ 0.221/  0.305   0.754/ 0.873/  1.087  worker ended by signal 6; first report from lock 0 in 10 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0
+abort-consume   2048 MiB   0.125/ 0.160/  0.185   0.167/ 0.216/  1.109  25.721/27.926/ 29.170  worker ended by signal 6; first report from lock 0 in 11 of 20; consume thread ran after its report: 0; runtime threads ran after the first report in 0

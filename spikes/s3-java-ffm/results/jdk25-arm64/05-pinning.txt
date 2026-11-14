@@ -1,0 +1,95 @@
+$ java --enable-native-access=ALL-UNNAMED -Ds3.out=/results/jdk25-arm64 -cp /spike/classes -Djdk.tracePinnedThreads=full S3 /tmp/scz-s3.sock pin
+S3 spike: java.version=25.0.5 vm=OpenJDK 64-Bit Server VM os.arch=aarch64 os.version=6.12.76-linuxkit cpus=4 nativeAccessEnabled=true pid=193
+modes=[pin]
+
+[g] --- virtual threads parked in the futex downcall ---
+[g] availableProcessors=4  scheduler parallelism=4  jdk.virtualThreadScheduler.maxPoolSize=(default 256)  jdk.tracePinnedThreads=full
+
+[g] scenario: baseline, nothing parked — 0 virtual thread(s) each parked in futex for up to 0 ms
+[g]   t=  249 ms  in-futex= 0 done= 0/0  ticker + 36  carrier threads=1
+[g]   t=  500 ms  in-futex= 0 done= 0/0  ticker + 37  carrier threads=1
+[g]   t=  750 ms  in-futex= 0 done= 0/0  ticker + 36  carrier threads=1
+
+[g] scenario: carriers-1 parked (the design's cap) — 3 virtual thread(s) each parked in futex for up to 2000 ms
+[g]   t=  251 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t=  502 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t=  750 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t= 1000 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t= 1250 ms  in-futex= 3 done= 0/3  ticker + 39  carrier threads=4
+[g]   t= 1500 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t= 1751 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t= 2000 ms  in-futex= 3 done= 0/3  ticker + 37  carrier threads=4
+[g]   t= 2251 ms  in-futex= 0 done= 3/3  ticker + 38  carrier threads=4
+[g]   t= 2501 ms  in-futex= 0 done= 3/3  ticker + 37  carrier threads=4
+[g]   t= 2750 ms  in-futex= 0 done= 3/3  ticker + 37  carrier threads=4
+[g]   parker entered..returned: [4..2006 ms rc=-1] [4..2006 ms rc=-1] [4..2006 ms rc=-1]
+
+[g] scenario: every carrier parked — 4 virtual thread(s) each parked in futex for up to 2000 ms
+[g]   t=  253 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t=  501 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]     while parked: System.gc() from a platform thread took 18 ms
+[g]     while parked: started a new virtual thread 'late' at t=524 ms
+[g]     while parked: thread dump written to /results/jdk25-arm64/05-pinning-threaddump.txt
+[g]   t=  750 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 1003 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 1255 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 1500 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 1755 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 2000 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t= 2250 ms  in-futex= 0 done= 4/4  ticker + 40  carrier threads=4
+[g]   t= 2499 ms  in-futex= 0 done= 4/4  ticker + 41  carrier threads=4
+[g]   parker entered..returned: [0..2001 ms rc=-1] [0..2001 ms rc=-1] [0..2001 ms rc=-1] [0..2001 ms rc=-1]
+[g]   virtual thread 'late' first ran 1477 ms after it was started
+
+[g] scenario: 3x carriers parked — 12 virtual thread(s) each parked in futex for up to 1000 ms
+[g]   t=  250 ms  in-futex= 4 done= 0/12  ticker +  0  carrier threads=4
+[g]   t=  501 ms  in-futex= 4 done= 0/12  ticker +  0  carrier threads=4
+[g]   t=  750 ms  in-futex= 4 done= 0/12  ticker +  0  carrier threads=4
+[g]   t= 1001 ms  in-futex= 2 done= 2/12  ticker +  0  carrier threads=4
+[g]   t= 1250 ms  in-futex= 4 done= 4/12  ticker +  1  carrier threads=4
+[g]   t= 1500 ms  in-futex= 4 done= 4/12  ticker +  0  carrier threads=4
+[g]   t= 1750 ms  in-futex= 4 done= 4/12  ticker +  0  carrier threads=4
+[g]   t= 2000 ms  in-futex= 4 done= 4/12  ticker +  0  carrier threads=4
+[g]   t= 2251 ms  in-futex= 4 done= 8/12  ticker +  1  carrier threads=4
+[g]   t= 2499 ms  in-futex= 4 done= 8/12  ticker +  0  carrier threads=4
+[g]   t= 2750 ms  in-futex= 4 done= 8/12  ticker +  0  carrier threads=4
+[g]   t= 3000 ms  in-futex= 4 done= 8/12  ticker +  0  carrier threads=4
+[g]   t= 3250 ms  in-futex= 0 done=12/12  ticker + 39  carrier threads=4
+[g]   t= 3499 ms  in-futex= 0 done=12/12  ticker + 38  carrier threads=4
+[g]   t= 3749 ms  in-futex= 0 done=12/12  ticker + 42  carrier threads=4
+[g]   parker entered..returned: [0..1001 ms rc=-1] [0..1001 ms rc=-1] [0..1001 ms rc=-1] [0..1002 ms rc=-1] [1001..2002 ms rc=-1] [1001..2002 ms rc=-1] [1001..2002 ms rc=-1] [1002..2003 ms rc=-1] [2002..3003 ms rc=-1] [2002..3003 ms rc=-1] [2002..3003 ms rc=-1] [2003..3004 ms rc=-1]
+
+[g] scenario: every carrier parked, then woken from the helper process — 4 virtual thread(s) each parked in futex for up to 5000 ms; helper wakes all at ~500 ms
+[g]   t=  249 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]   t=  500 ms  in-futex= 4 done= 0/4  ticker +  0  carrier threads=4
+[g]     helper stored 1 and called FUTEX_WAKE(1000): 4 woken
+[g]   t=  750 ms  in-futex= 0 done= 4/4  ticker + 38  carrier threads=4
+[g]   t=  999 ms  in-futex= 0 done= 4/4  ticker + 40  carrier threads=4
+[g]   parker entered..returned: [0..504 ms rc=0] [0..504 ms rc=0] [0..504 ms rc=0] [0..504 ms rc=0]
+
+[g] scenario: nothing parked, with a yield-looping thread — 0 virtual thread(s) each parked in futex for up to 0 ms; plus one unrelated virtual thread that loops on Thread.yield()
+[g]   t=  250 ms  in-futex= 0 done= 0/0  ticker + 41  yielder +  549533  carrier threads=4
+[g]   t=  499 ms  in-futex= 0 done= 0/0  ticker + 40  yielder +  576924  carrier threads=4
+[g]   t=  749 ms  in-futex= 0 done= 0/0  ticker + 39  yielder +  563547  carrier threads=4
+
+[g] scenario: carriers-1 parked, with a yield-looping thread on the free carrier — 3 virtual thread(s) each parked in futex for up to 2000 ms; plus one unrelated virtual thread that loops on Thread.yield()
+[g]   t=  249 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1869879  carrier threads=4
+[g]   t=  502 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1833600  carrier threads=4
+[g]   t=  751 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1738083  carrier threads=4
+[g]   t= 1000 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1765702  carrier threads=4
+[g]   t= 1249 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1827711  carrier threads=4
+[g]   t= 1499 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1662125  carrier threads=4
+[g]   t= 1750 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1815905  carrier threads=4
+[g]   t= 2000 ms  in-futex= 3 done= 0/3  ticker +  0  yielder + 1771333  carrier threads=4
+[g]   t= 2249 ms  in-futex= 0 done= 3/3  ticker + 40  yielder +  543276  carrier threads=4
+[g]   t= 2499 ms  in-futex= 0 done= 3/3  ticker + 42  yielder +  540976  carrier threads=4
+[g]   parker entered..returned: [0..2000 ms rc=-1] [0..2001 ms rc=-1] [0..2000 ms rc=-1]
+
+[g] controls for pinning diagnostics (stdout lines from -Djdk.tracePinnedThreads, if any, appear here):
+
+[g] JFR recording over the whole test (jdk.VirtualThreadPinned threshold 0, jdk.VirtualThreadSubmitFailed): 1 event(s)
+[g]   jdk.VirtualThreadPinned thread=control-sleep-inside-upcall duration=100 ms pinnedReason="Native or VM frame on stack" blockingOperation="LockSupport.park" top frame=java.lang.VirtualThread.postPinnedEvent
+[g] events on the futex-parked virtual threads (parker-*): 0 in total; 0 lasting >= 500 ms, i.e. reporting the futex block itself
+
+S3 spike: modes [pin] completed
+[exit status 0]

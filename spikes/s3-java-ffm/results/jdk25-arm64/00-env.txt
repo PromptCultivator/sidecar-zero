@@ -1,0 +1,8 @@
+label: jdk25-arm64   mode: full   date: 2026-11-12T11:53:22Z
+uname -a: Linux 81b473fa43d2 6.12.76-linuxkit #1 SMP Fri May 29 10:00:01 UTC 2026 aarch64 GNU/Linux
+nproc: 4   page size: 4096
+cgroup cpu.max: 400000 100000   memory.max: 2147483648
+libc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+openjdk version "25.0.5" 2026-10-20 LTS
+OpenJDK Runtime Environment Temurin-25.0.5+8 (build 25.0.5+8-LTS)
+OpenJDK 64-Bit Server VM Temurin-25.0.5+8 (build 25.0.5+8-LTS, mixed mode, sharing)
