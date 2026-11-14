@@ -1,0 +1,32 @@
+[package]
+name = "scz-worker-core"
+description = "The SidecarZero worker: startup, heartbeat, and the consume loop around a backend"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+arrow-array.workspace = true
+arrow-buffer.workspace = true
+arrow-data.workspace = true
+arrow-ipc.workspace = true
+arrow-schema.workspace = true
+libc.workspace = true
+scz-chaos-proto = { path = "../../conformance/proto" }
+scz-shm = { path = "../scz-shm" }
+
+[features]
+# Crash points in scz-shm fire in this worker (testing §2.4); see scz_shm::crash.
+crashpoints = ["scz-shm/crashpoints"]
+
+[[bin]]
+name = "scz-worker-echo"
+path = "src/bin/scz-worker-echo.rs"
+
+[[bin]]
+name = "scz-worker-chaos"
+path = "src/bin/scz-worker-chaos.rs"
+
+[lints]
+workspace = true

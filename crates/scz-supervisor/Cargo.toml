@@ -1,0 +1,15 @@
+[package]
+name = "scz-supervisor"
+description = "The SidecarZero supervisor: owns the arena, spawns workers, answers the handshake"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+libc.workspace = true
+scz-shm = { path = "../scz-shm" }
+sha2.workspace = true
+
+[lints]
+workspace = true

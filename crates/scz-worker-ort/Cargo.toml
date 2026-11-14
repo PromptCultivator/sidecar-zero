@@ -1,0 +1,22 @@
+[package]
+name = "scz-worker-ort"
+description = "The SidecarZero worker for ONNX Runtime models: `sidecarzero-worker`"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sidecarzero-worker"
+path = "src/bin/sidecarzero-worker.rs"
+
+[dependencies]
+libc.workspace = true
+scz-shm = { path = "../scz-shm" }
+scz-worker-core = { path = "../scz-worker-core" }
+
+[build-dependencies]
+cc = "1.2"
+
+[lints]
+workspace = true

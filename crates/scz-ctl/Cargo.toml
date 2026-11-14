@@ -1,0 +1,18 @@
+[package]
+name = "scz-ctl"
+description = "sczctl: inspect and steer a running SidecarZero supervisor through its admin socket"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sczctl"
+path = "src/main.rs"
+
+[dependencies]
+libc.workspace = true
+scz-shm = { path = "../scz-shm" }
+
+[lints]
+workspace = true

@@ -1,0 +1,25 @@
+[package]
+name = "scz-worker-gguf"
+description = "The SidecarZero worker for GGUF embedding models through llama.cpp: `sidecarzero-worker-gguf`"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sidecarzero-worker-gguf"
+path = "src/bin/sidecarzero-worker-gguf.rs"
+
+[dependencies]
+libc.workspace = true
+scz-shm = { path = "../scz-shm" }
+scz-worker-core = { path = "../scz-worker-core" }
+
+[dev-dependencies]
+sidecarzero = { path = "../../sdks/rust" }
+
+[build-dependencies]
+cc = "1.2"
+
+[lints]
+workspace = true
