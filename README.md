@@ -1115,3 +1115,9 @@ make -C bench chaos-bench-quick
 - **Infrastructure Setup Guides:**
   - [Google Cloud Bare-Metal & GKE Setup](docs/setup/gcp.md)
   - [AWS EKS & Bare-Metal Setup](docs/setup/aws.md)
+
+---
+
+## License
+
+Licensed under the [Functional Source License, Version 1.1, ALv2 Future License (`FSL-1.1-ALv2`)](LICENSE). Each version converts to the Apache License, Version 2.0 on the second anniversary of the date it is made available.

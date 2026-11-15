@@ -36,7 +36,7 @@ metadata = "\n".join([
     "Name: sidecarzero",
     "Version: " + version,
     "Summary: Model inference through shared memory with a SidecarZero sidecar, with a fallback that always answers",
-    "License: Apache-2.0",
+    "License: FSL-1.1-ALv2",
     "Requires-Python: >=3.11",
     "Provides-Extra: numpy",
     'Requires-Dist: numpy>=1.26; extra == "numpy"',
