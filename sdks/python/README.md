@@ -54,7 +54,7 @@ scripts/dev bash -c 'sdks/python/build.sh && target/release/scz-conformance --bi
     --crash-bins=target/crash/release --agent=target/sdk/python/scz-agent-python \
     conformance/scenarios conformance/scenarios/crash'
 
-# Build a standalone abi3 wheel (sidecarzero-0.1.0-cp311-abi3-linux_<arch>.whl)
+# Build a standalone abi3 wheel (sidecarzero-0.1.1-cp311-abi3-linux_<arch>.whl)
 scripts/dev bash -c 'sdks/python/build-wheel.sh'
 ```
 

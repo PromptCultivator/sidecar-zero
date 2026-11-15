@@ -614,10 +614,10 @@ The `sidecarzero` Python package is a single `PyO3` `cp311-abi3` native extensio
 ```bash
 # Build the portable cp311-abi3 wheel inside the Linux dev container:
 ./scripts/dev bash -c 'sdks/python/build.sh && sdks/python/wheel.sh'
-# Output: target/sdk/python/dist/sidecarzero-0.1.0-cp311-abi3-linux_<arch>.whl
+# Output: target/sdk/python/dist/sidecarzero-0.1.1-cp311-abi3-linux_<arch>.whl
 
 # Install into your Python 3.11+ environment (include [numpy] for DenseF32ToScore or worker runner):
-pip install "target/sdk/python/dist/sidecarzero-0.1.0-cp311-abi3-linux_x86_64.whl[numpy]"
+pip install "target/sdk/python/dist/sidecarzero-0.1.1-cp311-abi3-linux_x86_64.whl[numpy]"
 ```
 
 Full PEP 484 type stubs (`_core.pyi`) and `py.typed` are bundled so `mypy` and `pyright` statically reject `Client(...)` calls missing `fallback=...`.
@@ -911,7 +911,7 @@ Add [`deploy/helm-kep753`](deploy/helm-kep753) as a dependency in your service's
 # Chart.yaml
 dependencies:
   - name: sidecarzero
-    version: 0.1.0
+    version: 0.1.1
     repository: "file://../../deploy/helm-kep753"
 ```
 
@@ -947,7 +947,7 @@ sidecarzero:
     mode: native                     # "native" (K8s 1.29+ KEP-753) or "classic" (K8s < 1.29)
   image:
     repository: ghcr.io/sidecarzero/sidecarzero-ort
-    tag: "0.1.0"
+    tag: "0.1.1"
   model:
     path: /models/fraud.ort
     sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" # optional pin
@@ -984,7 +984,7 @@ To switch the same chart to **GGUF** or **Python** models, change only `image`, 
 ```yaml
 # values.yaml — Example 2: GGUF embedding worker
 sidecarzero:
-  image: { repository: ghcr.io/sidecarzero/sidecarzero-gguf, tag: "0.1.0" }
+  image: { repository: ghcr.io/sidecarzero/sidecarzero-gguf, tag: "0.1.1" }
   model: { path: /models/bge-small-f16.gguf }
   extraArgs:
     - --worker-read=/models
@@ -993,7 +993,7 @@ sidecarzero:
 
 # values.yaml — Example 3: Python worker image (derived image with /app/my_model.py)
 sidecarzero:
-  image: { repository: my-registry/my-python-sidecar, tag: "0.1.0" }
+  image: { repository: my-registry/my-python-sidecar, tag: "0.1.1" }
   model: { path: /models/weights.npy }
   worker: { rlimitDataMi: 2048 }
   extraArgs:

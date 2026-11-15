@@ -580,11 +580,11 @@ checksum = "e1cf6437eb19a8f4a6cc0f7dca544973b0b78843adbfeb3683d1a94a0024a294"
 
 [[package]]
 name = "scz-chaos-proto"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "scz-shm"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "loom",
@@ -593,7 +593,7 @@ dependencies = [
 
 [[package]]
 name = "scz-worker-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "arrow-array",
  "arrow-buffer",
@@ -628,14 +628,14 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "sidecarzero"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "scz-shm",
 ]
 
 [[package]]
 name = "sidecarzero-python"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "pyo3",

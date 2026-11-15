@@ -8,7 +8,7 @@
 #   then
 #     target_link_libraries(app PRIVATE sidecarzero::sidecarzero)
 cmake_minimum_required(VERSION 3.20)
-project(sidecarzero VERSION 0.1.0 LANGUAGES CXX
+project(sidecarzero VERSION 0.1.1 LANGUAGES CXX
         DESCRIPTION "SidecarZero C++20 client: model inference through shared memory, with a fallback that always answers")
 
 include(GNUInstallDirs)

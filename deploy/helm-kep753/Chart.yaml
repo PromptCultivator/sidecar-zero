@@ -5,5 +5,5 @@ description: >-
   (or a classic container), its volumes, and the host container's environment
   (kubernetes-deploy §3). Include its named templates in your pod spec.
 type: library
-version: 0.1.0
-appVersion: "0.1.0"
+version: 0.1.1
+appVersion: "0.1.1"

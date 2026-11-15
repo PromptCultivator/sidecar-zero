@@ -958,14 +958,14 @@ checksum = "e1cf6437eb19a8f4a6cc0f7dca544973b0b78843adbfeb3683d1a94a0024a294"
 
 [[package]]
 name = "scz-abi-gen"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "toml",
 ]
 
 [[package]]
 name = "scz-bench-common"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-worker-ort",
@@ -973,7 +973,7 @@ dependencies = [
 
 [[package]]
 name = "scz-bench-host"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-bench-common",
@@ -983,7 +983,7 @@ dependencies = [
 
 [[package]]
 name = "scz-bench-server"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-bench-common",
@@ -991,7 +991,7 @@ dependencies = [
 
 [[package]]
 name = "scz-bench-triton"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "prost",
@@ -1003,11 +1003,11 @@ dependencies = [
 
 [[package]]
 name = "scz-chaos-proto"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "scz-conformance"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-chaos-proto",
@@ -1018,7 +1018,7 @@ dependencies = [
 
 [[package]]
 name = "scz-conformance-agent"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-chaos-proto",
@@ -1028,7 +1028,7 @@ dependencies = [
 
 [[package]]
 name = "scz-ctl"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-shm",
@@ -1036,7 +1036,7 @@ dependencies = [
 
 [[package]]
 name = "scz-demo-host"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-chaos-proto",
@@ -1045,21 +1045,21 @@ dependencies = [
 
 [[package]]
 name = "scz-kill-agent"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
 ]
 
 [[package]]
 name = "scz-loadgen"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "scz-bench-common",
 ]
 
 [[package]]
 name = "scz-shm"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "loom",
@@ -1068,7 +1068,7 @@ dependencies = [
 
 [[package]]
 name = "scz-supervisor"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "scz-shm",
@@ -1077,7 +1077,7 @@ dependencies = [
 
 [[package]]
 name = "scz-worker-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "arrow-array",
  "arrow-buffer",
@@ -1091,7 +1091,7 @@ dependencies = [
 
 [[package]]
 name = "scz-worker-gguf"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cc",
  "libc",
@@ -1102,7 +1102,7 @@ dependencies = [
 
 [[package]]
 name = "scz-worker-ort"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cc",
  "libc",
@@ -1182,7 +1182,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "sidecarzero"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "scz-shm",
 ]

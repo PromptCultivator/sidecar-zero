@@ -1,7 +1,7 @@
 [package]
 name = "sidecarzero-python"
 description = "The Python SDK's native core: PyO3 bindings over the Rust client (sidecarzero) and the worker core (scz-worker-core)"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "Apache-2.0"
 publish = false

@@ -1,6 +1,6 @@
 dependencies:
 - name: sidecarzero
   repository: file://../..
-  version: 0.1.0
-digest: sha256:0a79417dad618e0ba12babee45fcd5c1dcfbb9fe0cb6d679c05f0501976d6a4e
-generated: "2026-11-13T17:48:32.446959512Z"
+  version: 0.1.1
+digest: sha256:8e7a70c2f80f168d3ed68c018638f36d4014172102f43eed4bd6202e18215a39
+generated: "2026-11-15T03:10:00.031576884Z"
