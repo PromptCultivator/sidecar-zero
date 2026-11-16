@@ -3,7 +3,7 @@ name = "scz-conformance-agent"
 description = "The Rust SDK's conformance agent: a client driven by the runner's line protocol (testing §3)"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license = "Apache-2.0"
 publish.workspace = true
 
 [[bin]]

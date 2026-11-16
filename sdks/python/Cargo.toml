@@ -3,7 +3,7 @@ name = "sidecarzero-python"
 description = "The Python SDK's native core: PyO3 bindings over the Rust client (sidecarzero) and the worker core (scz-worker-core)"
 version = "0.1.1"
 edition = "2021"
-license = "FSL-1.1-ALv2"
+license = "Apache-2.0"
 publish = false
 
 # Excluded from the repository's workspace (root Cargo.toml): a cdylib that links against the

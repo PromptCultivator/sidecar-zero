@@ -3,7 +3,7 @@ name = "sidecarzero"
 description = "Rust client for SidecarZero: model inference through shared memory, with a mandatory fallback"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license = "Apache-2.0"
 publish.workspace = true
 
 [features]

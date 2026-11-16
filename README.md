@@ -1120,4 +1120,5 @@ make -C bench chaos-bench-quick
 
 ## License
 
-Licensed under the [Functional Source License, Version 1.1, ALv2 Future License (`FSL-1.1-ALv2`)](LICENSE). Each version converts to the Apache License, Version 2.0 on the second anniversary of the date it is made available.
+- **Core repository (sidecar, supervisor, workers, shared-memory runtime, benchmarks, deployment, and tooling):** Licensed under the [Functional Source License, Version 1.1, ALv2 Future License (`FSL-1.1-ALv2`)](LICENSE). Each version converts to the Apache License, Version 2.0 on the second anniversary of the date it is made available.
+- **Client SDKs ([`sdks/`](sdks/)):** Licensed under the [Apache License, Version 2.0 (`Apache-2.0`)](sdks/LICENSE).
