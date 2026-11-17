@@ -1,6 +1,6 @@
 """What the SDK's tests share: a real supervisor in a scratch directory, and the chaos worker's
-request format (conformance/proto). Binaries come from SCZ_BINS (default target/stable/bin),
-models from SCZ_MODELS (default target/stable/models)."""
+request format (conformance/proto). Binaries come from SCZ_BINS (default target/release),
+models from SCZ_MODELS (default target/models)."""
 
 import os
 import pathlib
@@ -12,8 +12,8 @@ import tempfile
 import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
-BINS = pathlib.Path(os.environ.get("SCZ_BINS", ROOT / "target/stable/bin"))
-MODELS = pathlib.Path(os.environ.get("SCZ_MODELS", ROOT / "target/stable/models"))
+BINS = pathlib.Path(os.environ.get("SCZ_BINS", ROOT / "target/release"))
+MODELS = pathlib.Path(os.environ.get("SCZ_MODELS", ROOT / "target/models"))
 
 
 def _runner_bins():

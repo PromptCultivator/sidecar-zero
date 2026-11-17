@@ -2,15 +2,16 @@
 # The Java SDK's own tests (run inside the dev container): the unit tests (golden fingerprint
 # and arena vectors, byte layout, slot transitions, the metrics without a sidecar, a stress test
 # against a Java-side model of the worker), the metrics against scz-worker-echo (sdk-contract §8),
-# then the allocation gate (testing §7) against real supervisors from
-# target/stable/bin: the chaos worker for opaque bytes, the ONNX worker with the fraud model for
-# the dense float32 frames. Non-zero on any failure.
+# then the allocation gate (testing §7) against real supervisors from SCZ_BINS
+# (default target/release): the chaos worker for opaque bytes, the ONNX worker with the fraud
+# model from SCZ_MODELS (default target/models) for the dense float32 frames. Non-zero on any failure.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 SDK=$ROOT/sdks/java-ffm
 OUT=$ROOT/target/sdk/java-ffm
-BINS=${SCZ_BINS:-$ROOT/target/stable/bin}
-MODELS=${SCZ_MODELS:-$ROOT/target/stable/models}
+BINS=${SCZ_BINS:-$ROOT/target/release}
+MODELS=${SCZ_MODELS:-$ROOT/target/models}
+[ -n "${SCZ_MODELS:-}" ] || python3 "$ROOT/models/gen.py" "$MODELS"
 "$SDK/build.sh"
 rm -rf "$OUT/test-classes"
 mkdir -p "$OUT/test-classes"
