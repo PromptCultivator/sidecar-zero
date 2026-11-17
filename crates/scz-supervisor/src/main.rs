@@ -1048,7 +1048,8 @@ fn run(args: Args) -> io::Result<()> {
         let n = shell.ep.wait(&mut evs)?;
         for ev in evs[..n].iter().copied() {
             let now = monotonic_ns();
-            match ev.u64 {
+            let token = ev.u64;
+            match token {
                 T_TIMER => {
                     drain(timer.as_fd(), &mut scratch[..8]);
                     last_tick = now;
