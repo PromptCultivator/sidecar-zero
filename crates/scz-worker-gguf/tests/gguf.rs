@@ -265,7 +265,7 @@ fn a_call_past_its_deadline_is_abandoned_by_the_abort_callback() {
 
     let dir = scratch();
     let cap = format!("--worker-arg=--max-infer-ms={cap_ms}");
-    let sc = serve(&dir, &["--slot-size=16384", "--worker-arg=--max-tokens=512", &cap]);
+    let sc = serve(&dir, &["--standby=none", "--slot-size=16384", "--worker-arg=--max-tokens=512", &cap]);
     let c = client(&sc, l);
     assert!(c.await_bound(Duration::from_secs(30)), "{}", sc.status());
     assert_sandboxed(&sc);
@@ -296,7 +296,7 @@ fn a_call_past_its_deadline_is_abandoned_by_the_abort_callback() {
         let o = c.infer(std::slice::from_ref(&short), Duration::from_secs(1));
         assert!(o.is_model(), "the next call: {:?}", o.source);
         eprintln!("the next call answered in {:.1} ms", t.elapsed().as_secs_f64() * 1e3);
-        std::thread::sleep(Duration::from_millis(250)); // let the worker's pace estimate decay
+        std::thread::sleep(Duration::from_millis(500)); // let the worker's pace estimate decay (5 half-lives)
     }
     assert_eq!(sc.worker_stat("deadline_drops"), 0, "the worker ran every long call rather than dropping it: {}", sc.dump());
     // The request's own deadline reaches the backend (BatchView::deadline_ns), so the abort
