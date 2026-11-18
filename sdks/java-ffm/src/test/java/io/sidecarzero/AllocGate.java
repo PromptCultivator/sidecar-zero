@@ -181,12 +181,18 @@ public final class AllocGate {
         int n = 20_000;
         long empty = platform(EMPTY, 20_000, n);
 
+        // Warm both the parked wait and the spinning hot path through platform() with the same
+        // lambda so C2 finishes compiling Engine.park, timedModel, and both loops of platform().
+        Body callNormal = i -> call(e, normal, 20 * ms);
+        Hooks.fixSpinCeiling(0);
+        platform(callNormal, 10_000, 5_000);
         Hooks.fixSpinCeiling(-1);
+        platform(callNormal, 60_000, 20_000);
         Stats s0 = e.stats();
-        gate("model answer, spinning (platform)", platform(i -> call(e, normal, 20 * ms), 20_000, n), empty, n, true, outcomes(s0, s0 = e.stats()));
+        gate("model answer, spinning (platform)", platform(callNormal, 20_000, n), empty, n, true, outcomes(s0, s0 = e.stats()));
 
         Hooks.fixSpinCeiling(0);
-        gate("model answer, after parking (platform)", platform(i -> call(e, normal, 20 * ms), 40_000, n), empty, n, true, outcomes(s0, s0 = e.stats()));
+        gate("model answer, after parking (platform)", platform(callNormal, 40_000, n), empty, n, true, outcomes(s0, s0 = e.stats()));
         Hooks.fixSpinCeiling(-1);
 
         gate("fallback at admission: TOO_LARGE (platform)", platform(i -> call(e, big, 20 * ms), 20_000, n), empty, n, true, outcomes(s0, s0 = e.stats()));
@@ -272,11 +278,15 @@ public final class AllocGate {
         long budget = 20_000_000L;
         int n = 20_000;
         long empty = platform(EMPTY, 20_000, n);
-        Stats s0 = sc.stats();
-        Hooks.fixSpinCeiling(-1);
-        gate("ScoreClient.scoreOutcome, spinning (platform)", platform(i -> sink += sc.scoreOutcome(f, budget), 20_000, n), empty, n, true, outcomes(s0, s0 = sc.stats()));
+        Body scoreOne = i -> sink += sc.scoreOutcome(f, budget);
         Hooks.fixSpinCeiling(0);
-        gate("ScoreClient.scoreOutcome, after parking (platform)", platform(i -> sink += sc.scoreOutcome(f, budget), 40_000, n), empty, n, true, outcomes(s0, s0 = sc.stats()));
+        platform(scoreOne, 2_000, 1_000);
+        Hooks.fixSpinCeiling(-1);
+        platform(scoreOne, 20_000, 10_000);
+        Stats s0 = sc.stats();
+        gate("ScoreClient.scoreOutcome, spinning (platform)", platform(scoreOne, 20_000, n), empty, n, true, outcomes(s0, s0 = sc.stats()));
+        Hooks.fixSpinCeiling(0);
+        gate("ScoreClient.scoreOutcome, after parking (platform)", platform(scoreOne, 40_000, n), empty, n, true, outcomes(s0, s0 = sc.stats()));
         Hooks.fixSpinCeiling(-1);
         long vEmpty = virtual(EMPTY, 20_000, n);
         gate("ScoreClient.scoreOutcome, spinning (virtual)", virtual(i -> sink += sc.scoreOutcome(f, budget), 20_000, n), vEmpty, n, true, outcomes(s0, s0 = sc.stats()));
