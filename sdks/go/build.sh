@@ -8,6 +8,7 @@ out="$root/target/sdk/go"
 mkdir -p "$out"
 cd "$here"
 export CGO_ENABLED=0
+export GOFLAGS="${GOFLAGS:+$GOFLAGS }-buildvcs=false"
 nice -n 10 go build ./...
 # Off Linux the SDK must still compile and serve fallbacks (sdk-contract §9).
 GOOS=darwin GOARCH=arm64 nice -n 10 go build ./...

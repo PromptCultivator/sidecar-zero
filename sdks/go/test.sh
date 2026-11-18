@@ -13,6 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 calls="${SCZ_ALLOC_CALLS:-1000000}"
 export SCZ_BINS="${SCZ_BINS:-$(cd ../.. && pwd)/target/release}"
+export GOFLAGS="${GOFLAGS:+$GOFLAGS }-buildvcs=false"
 
 unformatted="$(gofmt -l .)"
 if [ -n "$unformatted" ]; then
